@@ -1,9 +1,7 @@
 
 spring:
   datasource:
-    url:
-    password:
-    username:
+
   jpa:
 #    database-platform: org.hibernate.dialect.MySQL8InnoDBDialect
     generate-ddl: true
