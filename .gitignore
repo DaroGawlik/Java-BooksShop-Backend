@@ -33,5 +33,5 @@ build/
 .vscode/
 
 
-###SQL####
-schema.sql
+### YML ###
+application.yml
