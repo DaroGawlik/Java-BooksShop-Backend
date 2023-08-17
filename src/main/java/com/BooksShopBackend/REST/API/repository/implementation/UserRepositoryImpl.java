@@ -17,13 +17,14 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 
+import static query.UserQuery.*;
+import static query.UserQuery.INSERT_USER_QUERY;
+
 
 @Repository
 @RequiredArgsConstructor
 @Slf4j
 public class UserRepositoryImpl implements UserRepository<User> {
-    private static  final  String COUNT_USER_EMAIL_QUERY = "";
-    private static final String INSERT_USER_QUERY = "";
     private final NamedParameterJdbcTemplate jdbc;
 
     @Override
@@ -36,6 +37,7 @@ public class UserRepositoryImpl implements UserRepository<User> {
             SqlParameterSource paramaters = getSqlParameterSource(user);
             jdbc.update(INSERT_USER_QUERY, paramaters, holder);
             user.setId(Objects.requireNonNull(holder.getKey().longValue()));
+            accRepository.addAccToUser(user.getId(), ACC_USER.name());
         } catch (EmptyResultDataAccessException exception) {
 
         } catch (Exception exception)
