@@ -4,9 +4,10 @@ import com.BooksShopBackend.REST.API.models.SignupRequest;
 import com.BooksShopBackend.REST.API.responses.AuthResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+//import org.springframework.web.bind.annotation.CrossOrigin;
 
 @RestController
-    @CrossOrigin("*")
+@CrossOrigin("*")
     public class AuthController {
 
     @PostMapping("/signup")
