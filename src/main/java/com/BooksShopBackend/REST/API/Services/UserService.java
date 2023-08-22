@@ -26,13 +26,13 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         System.out.println("In the user details service");
+
 //        if(!username.equals("Ethan")) throw new UsernameNotFoundException("Not ethan");
 //
 //        Set<Role> roles = new HashSet<>();
 //        roles.add(new Role(1, "User"));
 //
 //        return new ApplicationUser(1, "Ethan", encoder.encode("password"), roles);
-
         return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("user is not valid"));
     }
 }

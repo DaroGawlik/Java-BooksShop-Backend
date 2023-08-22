@@ -1,0 +1,22 @@
+package com.BooksShopBackend.REST.API.controller;
+
+import com.BooksShopBackend.REST.API.Services.AuthenticationService;
+import com.BooksShopBackend.REST.API.models.ApplicationUser;
+import com.BooksShopBackend.REST.API.models.RegistrationDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/auth")
+@CrossOrigin("*")
+public class AuthenticationController {
+
+    @Autowired
+    private AuthenticationService authenticationService;
+
+    @PostMapping("/register")
+    public ApplicationUser applicationUser(@RequestBody RegistrationDTO body){
+        return authenticationService.registerUser(body.getUsername(), body.getPassword());
+    }
+
+}
