@@ -49,19 +49,34 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-        http
-                .csrf(csrf -> csrf.disable())
+      return  http
+              .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/auth/**").permitAll();
                     auth.requestMatchers("/admin/**").hasRole("ADMIN");
                     auth.requestMatchers("/user/**").hasAnyRole("ADMIN", "USER");
                     auth.anyRequest().authenticated();
-                });
-
-        return http.build();
+                })
+        .httpBasic(withDefaults()).build();
     }
 }
+//    @Bean
+//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+//        return  http
+//                .csrf(csrf -> csrf.disable())
+//                .authorizeHttpRequests(auth -> {
+//                    auth.requestMatchers("/auth/**").permitAll();
+//                    auth.requestMatchers("/admin/**").permitAll();
+//                    auth.requestMatchers("/user/**").permitAll();
+//                    auth.anyRequest().permitAll(); // Jak tutja byłoa utorized to nie działało
 
+//                })
+//                .httpBasic(withDefaults()).build();
+//    }
+
+
+
+//        return http.build();
 //    @Bean
 //    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 //        http
