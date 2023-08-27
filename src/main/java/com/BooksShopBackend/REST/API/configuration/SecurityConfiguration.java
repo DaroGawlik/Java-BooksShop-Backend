@@ -18,6 +18,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -35,6 +36,9 @@ import org.springframework.security.web.SecurityFilterChain;
 //import com.nimbusds.jose.proc.SecurityContext;
 //import com.unkownkoder.utils.RSAKeyProperties;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
@@ -43,10 +47,9 @@ public class SecurityConfiguration {
 
     private final RSAKeyProperties keys;
 
-    public SecurityConfiguration(RSAKeyProperties keys) {
+    public SecurityConfiguration(RSAKeyProperties keys){
         this.keys = keys;
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder(){
@@ -54,79 +57,53 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public AuthenticationManager authManager (UserDetailsService detailsService){
+    public AuthenticationManager authManager(UserDetailsService detailsService){
         DaoAuthenticationProvider daoProvider = new DaoAuthenticationProvider();
         daoProvider.setUserDetailsService(detailsService);
+        daoProvider.setPasswordEncoder(passwordEncoder());
         return new ProviderManager(daoProvider);
     }
 
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-      return  http
-              .csrf(csrf -> csrf.disable())
+        http
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/auth/**").permitAll();
                     auth.requestMatchers("/admin/**").hasRole("ADMIN");
                     auth.requestMatchers("/user/**").hasAnyRole("ADMIN", "USER");
                     auth.anyRequest().authenticated();
-                })
-              .oauth2ResourceServer(auth -> auth
-                      .jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter()))
-              )
-              .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                });
 
-        .httpBasic(withDefaults()).build();
-    }
-    @Bean
-    public JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        // Tutaj można dodać dodatkowe konfiguracje dla konwertera, jeśli są potrzebne
-        // Tutaj można dodać dodatkowe konfiguracje dla konwertera, jeśli są potrzebne
+        http.oauth2ResourceServer()
+                .jwt()
+                .jwtAuthenticationConverter(jwtAuthenticationConverter());
+        http.sessionManagement(
+                session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        );
 
-        // Tutaj można dodać dodatkowe konfiguracje dla konwertera, jeśli są potrzebne
-
-        return converter;
+        return http.build();
     }
 
-
     @Bean
-    public JwtDecoder jwtDecoder() {
+    public JwtDecoder jwtDecoder(){
         return NimbusJwtDecoder.withPublicKey(keys.getPublicKey()).build();
     }
 
-    @Bean JwtEncoder jwtEncoder(){
+    @Bean
+    public JwtEncoder jwtEncoder(){
         JWK jwk = new RSAKey.Builder(keys.getPublicKey()).privateKey(keys.getPrivateKey()).build();
         JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
         return new NimbusJwtEncoder(jwks);
     }
+
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter(){
+        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
+        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+        JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
+        jwtConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+        return jwtConverter;
+    }
 }
-//    @Bean
-//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-//        return  http
-//                .csrf(csrf -> csrf.disable())
-//                .authorizeHttpRequests(auth -> {
-//                    auth.requestMatchers("/auth/**").permitAll();
-//                    auth.requestMatchers("/admin/**").permitAll();
-//                    auth.requestMatchers("/user/**").permitAll();
-//                    auth.anyRequest().permitAll(); // Jak tutja byłoa utorized to nie działało
-
-//                })
-//                .httpBasic(withDefaults()).build();
-//    }
-
-
-
-//        return http.build();
-//    @Bean
-//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//        http
-//                .csrf(csrf -> csrf.disable())
-//                .authorizeHttpRequests(auth -> {
-//                    auth.requestMatchers("/auth/**").permitAll();
-////                    auth.requestMatchers("/admin/**").hasRole("ADMIN");
-////                    auth.requestMatchers("/user/**").hasAnyRole("ADMIN", "USER");
-//                    auth.anyRequest().authenticated();
-//                });
-//        return null;
-//    }
