@@ -39,7 +39,7 @@ public class AuthenticationService {
 
     @Autowired
     private TokenService tokenService;
-    public ApplicationUser registerUser(String username, String password){
+    public ApplicationUser registerUser(String username,String email ,String password){
 
         String encodedPassword = passwordEncoder.encode(password);
         Role userRole = roleRepository.findByAuthority("USER").get();

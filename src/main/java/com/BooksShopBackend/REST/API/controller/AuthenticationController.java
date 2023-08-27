@@ -26,7 +26,7 @@ public class AuthenticationController {
             return ResponseEntity.badRequest().body(errorResponse);
         }
 
-        ApplicationUser registeredUser = authenticationService.registerUser(body.getUsername(), body.getPassword());
+        ApplicationUser registeredUser = authenticationService.registerUser(body.getUsername(), body.getEmail(), body.getPassword());
         return ResponseEntity.ok(registeredUser);
     }
 

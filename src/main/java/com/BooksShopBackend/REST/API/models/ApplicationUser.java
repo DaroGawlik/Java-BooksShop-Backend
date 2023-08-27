@@ -47,7 +47,7 @@ public class ApplicationUser implements UserDetails {
     public Integer getUserId(){
         return this.userId;
     }
-    public void getUserId(Integer userId){
+    public void setUserId(Integer userId){
         this.userId = userId;
     }
     @Override
@@ -73,7 +73,7 @@ public class ApplicationUser implements UserDetails {
         return this.username;
     }
 
-    public void setUserName(String username){
+    public void setUsername(String username){
         this.username = username;
     }
 
