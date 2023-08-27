@@ -4,15 +4,18 @@ public class RegistrationDTO {
     private String username;
     private String password;
 
+    private Boolean returnSecureToken;
+
 
     public RegistrationDTO(){
         super();
     }
 
-    public RegistrationDTO(String username, String password){
+    public RegistrationDTO(String username, String password, Boolean returnSecureToken){
         super();
         this.username = username;
         this.password = password;
+        this.returnSecureToken = returnSecureToken;
     }
 
     public String getUsername(){
@@ -30,7 +33,13 @@ public class RegistrationDTO {
     public void setPassword(String password){
         this.password = password;
     }
+    public Boolean getReturnSecureToken() {
+        return this.returnSecureToken;
+    }
 
+    public void setReturnSecureToken(Boolean returnSecureToken) {
+        this.returnSecureToken = returnSecureToken;
+    }
     public String toString(){
         return "Registration info: username: " + this.username + " password: " + this.password;
     }

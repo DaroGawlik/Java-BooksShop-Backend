@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 @SpringBootApplication
-
 public class RestApiApplication {
 
 	public static void main(String[] args) {
