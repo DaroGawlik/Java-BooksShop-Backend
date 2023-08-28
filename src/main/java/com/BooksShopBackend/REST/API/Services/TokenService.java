@@ -8,6 +8,7 @@ import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,22 +20,24 @@ public class TokenService {
     @Autowired
     private JwtDecoder jwtDecoder;
 
-    public String generateJwt(Authentication auth){
-
+    public String generateJwt(String username, Collection<? extends GrantedAuthority> authorities) {
         Instant now = Instant.now();
 
-        String scope = auth.getAuthorities().stream()
+        String scope = authorities.stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(" "));
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("self")
                 .issuedAt(now)
-                .subject(auth.getName())
+                .subject(username)
                 .claim("roles", scope)
                 .build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
 
+    public String generateRefreshToken() {
+        // Implementacja generowania refreshToken
+    }
 }

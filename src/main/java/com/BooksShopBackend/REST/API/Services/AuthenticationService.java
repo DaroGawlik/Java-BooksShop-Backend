@@ -2,6 +2,7 @@ package com.BooksShopBackend.REST.API.Services;
 
 import com.BooksShopBackend.REST.API.models.ApplicationUser;
 import com.BooksShopBackend.REST.API.models.LoginResponseDTO;
+import com.BooksShopBackend.REST.API.models.RegistrationResponseDTO;
 import com.BooksShopBackend.REST.API.models.Role;
 import com.BooksShopBackend.REST.API.repository.RoleRepository;
 import com.BooksShopBackend.REST.API.repository.UserRepository;
@@ -36,9 +37,9 @@ public class AuthenticationService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-
     @Autowired
     private TokenService tokenService;
+
     public ApplicationUser registerUser(String username,String email ,String password){
 
         String encodedPassword = passwordEncoder.encode(password);
@@ -47,8 +48,16 @@ public class AuthenticationService {
         Set<Role> authorities = new HashSet<>();
 
          authorities.add(userRole);
+        ApplicationUser registeredUser = userRepository.save(new ApplicationUser(0, username, email, encodedPassword, authorities));
 
-        return userRepository.save(new ApplicationUser(0, username, encodedPassword, authorities));
+        String idToken = tokenService.generateJwt(); // Uzyskaj idToken z tokenService
+        String refreshToken = tokenService.generateRefreshToken(); // Uzyskaj refreshToken z tokenService
+
+        RegistrationResponseDTO responseDTO = new RegistrationResponseDTO();
+        responseDTO.setLocalId(registeredUser.getUserId().toString());
+        responseDTO.setUsername(registeredUser.getUsername());
+        responseDTO.setIdToken(idToken);
+        responseDTO.setRefreshToken(refreshToken);
     }
 
 
