@@ -40,40 +40,40 @@ public class AuthenticationService {
     @Autowired
     private TokenService tokenService;
 
-    public ApplicationUser registerUser(String username,String email ,String password){
-
+    public RegistrationResponseDTO registerUser(String username, String email, String password) {
         String encodedPassword = passwordEncoder.encode(password);
         Role userRole = roleRepository.findByAuthority("USER").get();
 
         Set<Role> authorities = new HashSet<>();
+        authorities.add(userRole);
 
-         authorities.add(userRole);
         ApplicationUser registeredUser = userRepository.save(new ApplicationUser(0, username, email, encodedPassword, authorities));
-
-        String idToken = tokenService.generateJwt(); // Uzyskaj idToken z tokenService
-        String refreshToken = tokenService.generateRefreshToken(); // Uzyskaj refreshToken z tokenService
+        String idToken = tokenService.generateJwt(username, authorities);
+        String refreshToken = tokenService.generateRefreshToken();
 
         RegistrationResponseDTO responseDTO = new RegistrationResponseDTO();
         responseDTO.setLocalId(registeredUser.getUserId().toString());
         responseDTO.setUsername(registeredUser.getUsername());
         responseDTO.setIdToken(idToken);
         responseDTO.setRefreshToken(refreshToken);
+
+        return responseDTO;
     }
 
 
-    public LoginResponseDTO loginUser(String username, String password){
-
-        try{
-            Authentication auth = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(username, password)
-            );
-
-            String token = tokenService.generateJwt((auth));
-
-            return new LoginResponseDTO(userRepository.findByUsername(username).get(), token);
-        } catch(AuthenticationException e){
-            return new LoginResponseDTO(null, "");
-        }
-    }
+//    public LoginResponseDTO loginUser(String username, String password){
+//
+//        try{
+//            Authentication auth = authenticationManager.authenticate(
+//                    new UsernamePasswordAuthenticationToken(username, password)
+//            );
+//
+//            String token = tokenService.generateJwt((auth));
+//
+//            return new LoginResponseDTO(userRepository.findByUsername(username).get(), token);
+//        } catch(AuthenticationException e){
+//            return new LoginResponseDTO(null, "");
+//        }
+//    }
 
 }

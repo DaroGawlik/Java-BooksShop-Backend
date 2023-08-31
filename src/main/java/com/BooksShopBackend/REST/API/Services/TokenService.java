@@ -7,7 +7,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.time.Instant;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -38,6 +40,10 @@ public class TokenService {
     }
 
     public String generateRefreshToken() {
-        // Implementacja generowania refreshToken
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] refreshTokenBytes = new byte[64];
+        secureRandom.nextBytes(refreshTokenBytes);
+
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(refreshTokenBytes);
     }
 }

@@ -1,10 +1,7 @@
 package com.BooksShopBackend.REST.API.controller;
 
 import com.BooksShopBackend.REST.API.Services.AuthenticationService;
-import com.BooksShopBackend.REST.API.models.ApplicationError;
-import com.BooksShopBackend.REST.API.models.ApplicationUser;
-import com.BooksShopBackend.REST.API.models.LoginResponseDTO;
-import com.BooksShopBackend.REST.API.models.RegistrationDTO;
+import com.BooksShopBackend.REST.API.models.*;
 import com.BooksShopBackend.REST.API.utils.ReturnSecureTokenException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +15,6 @@ public class AuthenticationController {
 
     @Autowired
     private AuthenticationService authenticationService;
-
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody RegistrationDTO body) {
         if (body.getReturnSecureToken() == null || !body.getReturnSecureToken()) {
@@ -26,14 +22,16 @@ public class AuthenticationController {
             return ResponseEntity.badRequest().body(errorResponse);
         }
 
-        ApplicationUser registeredUser = authenticationService.registerUser(body.getUsername(), body.getEmail(), body.getPassword());
-        return ResponseEntity.ok(registeredUser);
+        RegistrationResponseDTO responseDTO = authenticationService.registerUser(body.getUsername(), body.getEmail(), body.getPassword());
+
+        // Zwracanie odpowiedzi rejestracji z nowymi tokenami
+        return ResponseEntity.ok(responseDTO);
     }
 
 
-    @PostMapping("/login")
-    public LoginResponseDTO loginUser(@RequestBody RegistrationDTO body){
-        return authenticationService.loginUser(body.getUsername(), body.getPassword());
-    }
+//    @PostMapping("/login")
+//    public LoginResponseDTO loginUser(@RequestBody RegistrationDTO body){
+//        return authenticationService.loginUser(body.getUsername(), body.getPassword());
+//    }
 
 }
