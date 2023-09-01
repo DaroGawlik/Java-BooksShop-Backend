@@ -2,9 +2,7 @@ package com.BooksShopBackend.REST.API.controller;
 
 import com.BooksShopBackend.REST.API.Services.AuthenticationService;
 import com.BooksShopBackend.REST.API.models.*;
-import com.BooksShopBackend.REST.API.utils.ReturnSecureTokenException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +24,9 @@ public class AuthenticationController {
 
         // Zwracanie odpowiedzi rejestracji z nowymi tokenami
         return ResponseEntity.ok(responseDTO);
+
     }
+
 
 
 //    @PostMapping("/login")

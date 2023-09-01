@@ -21,7 +21,8 @@ public class RestApiApplication {
 	}
 
 	@Bean
-	CommandLineRunner run (RoleRepository roleRepository, UserRepository userRepository, PasswordEncoder passwordEncode){
+	CommandLineRunner run (RoleRepository roleRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+
 		//	CommandLineRunner run która jest wywoływana po uruchomieniu aplikacji Spring Boot. Ten interfejs jest często wykorzystywany
 		//	do definiowania kodu, który powinien być wykonany tuż po uruchomieniu aplikacji.
 		return args ->{
@@ -32,7 +33,7 @@ public class RestApiApplication {
 			Set<Role> roles = new HashSet<>();
 			roles.add(adminRole);
 
-			ApplicationUser admin = new ApplicationUser(1, "admin", "admin@email.com",passwordEncode.encode("password"), roles);
+			ApplicationUser admin = new ApplicationUser(1, "admin", "admin@email.com",passwordEncoder.encode("password"), roles);
 
 			userRepository.save(admin);
 		};

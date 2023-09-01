@@ -1,16 +1,12 @@
 package com.BooksShopBackend.REST.API.Services;
 
 import com.BooksShopBackend.REST.API.models.ApplicationUser;
-import com.BooksShopBackend.REST.API.models.LoginResponseDTO;
 import com.BooksShopBackend.REST.API.models.RegistrationResponseDTO;
 import com.BooksShopBackend.REST.API.models.Role;
 import com.BooksShopBackend.REST.API.repository.RoleRepository;
 import com.BooksShopBackend.REST.API.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +29,6 @@ public class AuthenticationService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -48,7 +43,7 @@ public class AuthenticationService {
         authorities.add(userRole);
 
         ApplicationUser registeredUser = userRepository.save(new ApplicationUser(0, username, email, encodedPassword, authorities));
-        String idToken = tokenService.generateJwt(username, authorities);
+        String idToken = tokenService.generateJwt("exampleUser", authorities, 30);
         String refreshToken = tokenService.generateRefreshToken();
 
         RegistrationResponseDTO responseDTO = new RegistrationResponseDTO();
