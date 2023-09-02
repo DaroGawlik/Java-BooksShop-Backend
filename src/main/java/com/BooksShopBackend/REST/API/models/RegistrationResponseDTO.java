@@ -26,6 +26,7 @@ public class RegistrationResponseDTO {
         this.localId = localId;
     }
 
+
     public String getUsername() {
         return username;
     }
