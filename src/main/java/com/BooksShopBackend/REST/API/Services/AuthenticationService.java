@@ -1,17 +1,22 @@
 package com.BooksShopBackend.REST.API.Services;
 
 import com.BooksShopBackend.REST.API.models.ApplicationUser;
+import com.BooksShopBackend.REST.API.models.LoginResponseDTO;
 import com.BooksShopBackend.REST.API.models.RegistrationResponseDTO;
 import com.BooksShopBackend.REST.API.models.Role;
 import com.BooksShopBackend.REST.API.repository.RoleRepository;
 import com.BooksShopBackend.REST.API.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -35,6 +40,7 @@ public class AuthenticationService {
     @Autowired
     private TokenService tokenService;
 
+
     public RegistrationResponseDTO registerUser(String username, String email, String password) {
         String encodedPassword = passwordEncoder.encode(password);
         Role userRole = roleRepository.findByAuthority("USER").get();
@@ -43,17 +49,48 @@ public class AuthenticationService {
         authorities.add(userRole);
 
         ApplicationUser registeredUser = userRepository.save(new ApplicationUser(0, username, email, encodedPassword, authorities));
-        String idToken = tokenService.generateJwt("exampleUser", authorities, 30);
+        String idToken = tokenService.generateJwt("exampleUser", authorities, 600);
         String refreshToken = tokenService.generateRefreshToken();
 
         RegistrationResponseDTO responseDTO = new RegistrationResponseDTO();
-        responseDTO.setLocalId(registeredUser.getUserId().toString());
+        responseDTO.setUserId(registeredUser.getUserId().toString());
         responseDTO.setUsername(registeredUser.getUsername());
         responseDTO.setIdToken(idToken);
         responseDTO.setRefreshToken(refreshToken);
 
         return responseDTO;
     }
+
+    public LoginResponseDTO loginUser(String username, String password) {
+        try {
+            Authentication auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, password)
+            );
+
+            String token = tokenService.generateJwt(
+                    auth.getName(), // Pobierz nazwę użytkownika z obiektu Authentication
+                    auth.getAuthorities(), // Pobierz uprawnienia z obiektu Authentication
+                    600 // Długość ważności tokenu w sekundach (możesz dostosować to do swoich potrzeb)
+            );
+
+            return new LoginResponseDTO(userRepository.findByUsername(username).get(), token);
+
+        } catch (AuthenticationException e) {
+            return new LoginResponseDTO(null, "");
+        }
+    }
+
+    public boolean deleteUser(Integer userId){
+            Optional<ApplicationUser> userByUserId = userRepository.findByUserId(userId);
+            if (userByUserId.isPresent()) {
+                userRepository.delete(userByUserId.get());
+                return true;
+            }
+            return false;
+        }
+
+
+}
 
 
 //    public LoginResponseDTO loginUser(String username, String password){
@@ -71,4 +108,3 @@ public class AuthenticationService {
 //        }
 //    }
 
-}

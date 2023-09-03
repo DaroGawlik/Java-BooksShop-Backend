@@ -1,15 +1,9 @@
 package com.BooksShopBackend.REST.API.Services;
 
-import com.BooksShopBackend.REST.API.utils.RSAKeyProperties;
-import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Collection;
@@ -29,18 +23,23 @@ import io.jsonwebtoken.security.Keys;
 
 @Service
 public class TokenService {
-
     @Autowired
     private JwtEncoder jwtEncoder;
 
     @Autowired
     private JwtDecoder jwtDecoder;
 
-    public String generateJwt(String username, Collection<? extends GrantedAuthority> authorities, long expirationInSeconds) {
-        SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private final SecretKey secretKey;
 
+    @Autowired
+    public TokenService() {
+        // Generuj klucz tajny tylko raz i zachowaj go
+        this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    }
+
+    public String generateJwt(String username, Collection<? extends GrantedAuthority> authorities, long expirationInSeconds) {
         Instant now = Instant.now();
-        Instant expiration = now.plusSeconds(expirationInSeconds); // Ustawić czas wygaśnięcia na podstawie podanej liczby sekund.
+        Instant expiration = now.plusSeconds(expirationInSeconds);
 
         String scope = authorities.stream()
                 .map(GrantedAuthority::getAuthority)
@@ -49,14 +48,15 @@ public class TokenService {
         String token = Jwts.builder()
                 .setIssuer("self")
                 .setIssuedAt(Date.from(now))
-                .setExpiration(Date.from(expiration)) // Ustawienie czasu wygaśnięcia
+                .setExpiration(Date.from(expiration))
                 .setSubject(username)
                 .claim("roles", scope)
-                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .signWith(secretKey, SignatureAlgorithm.HS256) // Użyj zachowanego klucza
                 .compact();
 
         return token;
     }
+
 
 
     public String generateRefreshToken() {

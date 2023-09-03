@@ -1,7 +1,7 @@
 package com.BooksShopBackend.REST.API.models;
 
 public class RegistrationResponseDTO {
-    private String localId;
+    private String userId;
     private String username;
     private String idToken;
     private String refreshToken;
@@ -18,12 +18,12 @@ public class RegistrationResponseDTO {
         this.refreshToken = refreshToken;
     }
 
-    public String getLocalId() {
-        return localId;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setLocalId(String localId) {
-        this.localId = localId;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
 
