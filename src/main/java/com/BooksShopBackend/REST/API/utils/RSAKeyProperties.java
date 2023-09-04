@@ -22,17 +22,15 @@ public class RSAKeyProperties {
         return this.publicKey;
     }
 
-    public void setPublicKey(RSAPublicKey publicKey){
-        this.publicKey = publicKey;
-    }
+//    public void setPublicKey(RSAPublicKey publicKey){
+//        this.publicKey = publicKey;
+//    }
 
     public RSAPrivateKey getPrivateKey(){
         return this.privateKey;
     }
 
-    public void setPrivateKey(RSAPrivateKey privateKey){
-        this.privateKey = privateKey;
-    }
-
-
+//    public void setPrivateKey(RSAPrivateKey privateKey){
+//        this.privateKey = privateKey;
+//    }
 }

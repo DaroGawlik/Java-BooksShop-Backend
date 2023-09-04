@@ -11,13 +11,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Transactional
@@ -49,7 +48,11 @@ public class AuthenticationService {
         authorities.add(userRole);
 
         ApplicationUser registeredUser = userRepository.save(new ApplicationUser(0, username, email, encodedPassword, authorities));
-        String idToken = tokenService.generateJwt("exampleUser", authorities, 600);
+
+        Authentication auth = new UsernamePasswordAuthenticationToken(username, password);
+
+        String idToken = tokenService.generateJwt(auth);
+
         String refreshToken = tokenService.generateRefreshToken();
 
         RegistrationResponseDTO responseDTO = new RegistrationResponseDTO();
@@ -61,21 +64,18 @@ public class AuthenticationService {
         return responseDTO;
     }
 
-    public LoginResponseDTO loginUser(String username, String password) {
-        try {
+    public LoginResponseDTO loginUser(String username, String password){
+
+        try{
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
             );
 
-            String token = tokenService.generateJwt(
-                    auth.getName(), // Pobierz nazwę użytkownika z obiektu Authentication
-                    auth.getAuthorities(), // Pobierz uprawnienia z obiektu Authentication
-                    600 // Długość ważności tokenu w sekundach (możesz dostosować to do swoich potrzeb)
-            );
+            String token = tokenService.generateJwt(auth);
 
             return new LoginResponseDTO(userRepository.findByUsername(username).get(), token);
 
-        } catch (AuthenticationException e) {
+        } catch(AuthenticationException e){
             return new LoginResponseDTO(null, "");
         }
     }

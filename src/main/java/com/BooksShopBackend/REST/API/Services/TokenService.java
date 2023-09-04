@@ -1,7 +1,10 @@
 package com.BooksShopBackend.REST.API.Services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -29,32 +32,22 @@ public class TokenService {
     @Autowired
     private JwtDecoder jwtDecoder;
 
-    private final SecretKey secretKey;
+    public String generateJwt(Authentication auth){
 
-    @Autowired
-    public TokenService() {
-        // Generuj klucz tajny tylko raz i zachowaj go
-        this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    }
-
-    public String generateJwt(String username, Collection<? extends GrantedAuthority> authorities, long expirationInSeconds) {
         Instant now = Instant.now();
-        Instant expiration = now.plusSeconds(expirationInSeconds);
 
-        String scope = authorities.stream()
+        String scope = auth.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(" "));
 
-        String token = Jwts.builder()
-                .setIssuer("self")
-                .setIssuedAt(Date.from(now))
-                .setExpiration(Date.from(expiration))
-                .setSubject(username)
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer("self")
+                .issuedAt(now)
+                .subject(auth.getName())
                 .claim("roles", scope)
-                .signWith(secretKey, SignatureAlgorithm.HS256) // Użyj zachowanego klucza
-                .compact();
+                .build();
 
-        return token;
+        return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
 
 
