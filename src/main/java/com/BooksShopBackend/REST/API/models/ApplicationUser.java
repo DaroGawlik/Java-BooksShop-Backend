@@ -17,9 +17,9 @@ public class ApplicationUser implements UserDetails {
     @Column(name="user_id")
     private Integer userId;
 
-    @Column(unique = true)
+
     private String username;
-//    @Column(unique = true)
+    @Column(unique = true)
     private String email;
     private String password;
     @ManyToMany(fetch = FetchType.EAGER)

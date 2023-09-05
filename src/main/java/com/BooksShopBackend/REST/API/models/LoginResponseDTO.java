@@ -1,32 +1,58 @@
 package com.BooksShopBackend.REST.API.models;
 
-public class LoginResponseDTO {
-    private ApplicationUser user;
-    private String jwt;
+import java.util.Optional;
 
-    public LoginResponseDTO(){
+public class LoginResponseDTO {
+    private String userId;
+    private String username;
+    private String idToken;
+    private String refreshToken;
+    private final String expiresIn = "3600";
+
+    public LoginResponseDTO() {
         super();
     }
 
-
-    public LoginResponseDTO(ApplicationUser user, String jwt){
-        this.user = user;
-        this.jwt = jwt;
+    public LoginResponseDTO(String userId, String username, String idToken, String refreshToken) {
+        this.userId = userId;
+        this.username = username;
+        this.idToken = idToken;
+        this.refreshToken = refreshToken;
     }
 
-    public ApplicationUser getUser(){
-        return this.user;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setUser(ApplicationUser user){
-        this.user = user;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
-    public String getJwt(){
-        return this.jwt;
+    public String getUsername() {
+        return username;
     }
 
-    public void setJwt(String jwt){
-        this.jwt = jwt;
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getIdToken() {
+        return idToken;
+    }
+
+    public void setIdToken(String idToken) {
+        this.idToken = idToken;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public String getExpiresIn() {
+        return expiresIn;
     }
 }

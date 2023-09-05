@@ -12,9 +12,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 @Service
-public class UserService implements UserDetailsService {
+public class UserService implements  UserDetailsEmail {
 
     @Autowired
     private PasswordEncoder encoder;
@@ -23,11 +24,17 @@ public class UserService implements UserDetailsService {
     private UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("user is not valid"));
+
+
+    public UserDetails loadUserByEmail(String email) throws UsernameNotFoundException {
+        return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User is not valid"));
     }
-    public UserDetails loadUserByUserId(Integer userId) throws UsernameNotFoundException {
-        return userRepository.findByUserId(userId).orElseThrow(() -> new UsernameNotFoundException("User is not valid"));
-    }
+//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+//        return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("user is not valid"));
+//    }
+//
+//    public UserDetails loadUserByUserId(Integer userId) throws UsernameNotFoundException {
+//        return userRepository.findByUserId(userId).orElseThrow(() -> new UsernameNotFoundException("User is not valid"));
+//    }
 
 }

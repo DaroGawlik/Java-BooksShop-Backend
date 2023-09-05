@@ -1,6 +1,8 @@
 package com.BooksShopBackend.REST.API.configuration;
 
 
+import com.BooksShopBackend.REST.API.Services.UserDetailsEmail;
+import com.BooksShopBackend.REST.API.Services.UserDetailsEmailAdapter;
 import com.BooksShopBackend.REST.API.utils.RSAKeyProperties;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -56,9 +58,9 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public AuthenticationManager authManager(UserDetailsService detailsService){
+    public AuthenticationManager authManager(UserDetailsEmailAdapter userDetailsEmailAdapter) {
         DaoAuthenticationProvider daoProvider = new DaoAuthenticationProvider();
-        daoProvider.setUserDetailsService(detailsService);
+        daoProvider.setUserDetailsService(userDetailsEmailAdapter);
         daoProvider.setPasswordEncoder(passwordEncoder());
         return new ProviderManager(daoProvider);
     }
