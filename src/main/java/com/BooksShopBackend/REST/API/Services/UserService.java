@@ -1,7 +1,7 @@
 package com.BooksShopBackend.REST.API.Services;
 
+
 import com.BooksShopBackend.REST.API.models.ApplicationUser;
-import com.BooksShopBackend.REST.API.models.Role;
 import com.BooksShopBackend.REST.API.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
@@ -11,11 +11,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
 @Service
-public class UserService implements  UserDetailsEmail {
+public class UserService implements UserDetailsService {
 
     @Autowired
     private PasswordEncoder encoder;
@@ -24,11 +21,15 @@ public class UserService implements  UserDetailsEmail {
     private UserRepository userRepository;
 
     @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
+        ApplicationUser user = userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-    public UserDetails loadUserByEmail(String email) throws UsernameNotFoundException {
-        return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User is not valid"));
+        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), user.getAuthorities());
     }
+}
+
+
 //    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 //        return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("user is not valid"));
 //    }
@@ -36,5 +37,3 @@ public class UserService implements  UserDetailsEmail {
 //    public UserDetails loadUserByUserId(Integer userId) throws UsernameNotFoundException {
 //        return userRepository.findByUserId(userId).orElseThrow(() -> new UsernameNotFoundException("User is not valid"));
 //    }
-
-}

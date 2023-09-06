@@ -3,10 +3,16 @@ package com.BooksShopBackend.REST.API.controller;
 import com.BooksShopBackend.REST.API.Services.AuthenticationService;
 import com.BooksShopBackend.REST.API.Services.TokenService;
 import com.BooksShopBackend.REST.API.models.*;
+import com.BooksShopBackend.REST.API.models.Errors.ApplicationError;
+import com.BooksShopBackend.REST.API.models.Errors.InvalidCredentialsError;
+import com.BooksShopBackend.REST.API.models.Errors.UserNotFoundError;
+import com.BooksShopBackend.REST.API.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
@@ -19,51 +25,53 @@ public class AuthenticationController {
     @Autowired
     private TokenService tokenService;
 
+    @Autowired
+    private UserRepository userRepository;
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody RegistrationDTO body) {
         if (body.getReturnSecureToken() == null || !body.getReturnSecureToken()) {
-            ApplicationError errorResponse = new ApplicationError("Registration with returnSecureToken=false is not allowed");
+            ApplicationError errorResponse = new ApplicationError("Registration with returnSecureToken = false is not allowed");
             return ResponseEntity.badRequest().body(errorResponse);
         }
-
+        Optional<ApplicationUser> existingUserOptional = userRepository.findByEmail(body.getEmail());
+        if (existingUserOptional.isPresent()) {
+            ApplicationError errorResponse = new ApplicationError("This email " + body.getEmail() + " is already registered");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+        }
         try {
-            // Wywołaj serwis do obsługi rejestracji i otrzymaj odpowiedź
             RegistrationResponseDTO response = authenticationService.registerUser(body.getUsername(), body.getEmail(), body.getPassword());
-            return ResponseEntity.ok(response); // Zwróć sukces i odpowiedź z danymi użytkownika
+            return ResponseEntity.ok(response);
         } catch (ApplicationError e) {
-            // Tutaj możesz obsłużyć błąd związanym z już istniejącym adresem e-mail
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e); // Zwracamy błąd HTTP 409 Conflict
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
         }
     }
-
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginDTO body){
+    public ResponseEntity<?> loginUser(@RequestBody LoginDTO body) {
         if (body.getReturnSecureToken() == null || !body.getReturnSecureToken()) {
-            ApplicationError errorResponse = new ApplicationError("Registration with returnSecureToken=false is not allowed");
-            return ResponseEntity.badRequest().body(errorResponse);
+            return ResponseEntity.badRequest().body(new ApplicationError("Login with returnSecureToken = false is not allowed"));
         }
-        System.out.println("Received password: " + body.getPassword());
-        LoginResponseDTO responseDTO = authenticationService.loginUser(body.getEmail(), body.getPassword());
-                return ResponseEntity.ok(responseDTO);
+        try {
+            LoginResponseDTO responseDTO = authenticationService.loginUser(body.getEmail(), body.getPassword());
+            return ResponseEntity.ok(responseDTO);
+        } catch (InvalidCredentialsError e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e);
+        } catch (UserNotFoundError e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e);
+        } catch (ApplicationError e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
+        }
     }
-
     @DeleteMapping("/users/delete/{userId}")
-    public ResponseEntity<?> deleteUser(@PathVariable("userId") Integer userId, @RequestHeader("Authorization") String authorizationHeader) {
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            ApplicationError errorResponse = new ApplicationError("Missing or invalid authorization token.");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
-        }
-            boolean deleted = authenticationService.deleteUser(userId);
+    public ResponseEntity<?> deleteUser(@PathVariable("userId") Integer userId) {
+        Optional<ApplicationUser> userByUserId = userRepository.findByUserId(userId);
 
-        if (deleted) {
+        if (userByUserId.isPresent()) {
+            userRepository.delete(userByUserId.get());
             return ResponseEntity.ok("The user has been successfully deleted.");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with the provided ID was not found.");
         }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with the provided ID was not found.");
     }
-
-
 }
 
 

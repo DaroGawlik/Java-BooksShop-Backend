@@ -1,6 +1,7 @@
 package com.BooksShopBackend.REST.API.models;
 
 import jakarta.persistence.*;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -8,75 +9,38 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-
 @Entity
-@Table(name="users")
+@Table(name = "users")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ApplicationUser implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name="user_id")
+    @Column(name = "user_id")
     private Integer userId;
 
-
+    @Column(nullable = false)
     private String username;
-    @Column(unique = true)
+
+    @Column(unique = true, nullable = false)
     private String email;
+
     private String password;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_role_junction",
-            joinColumns = @JoinColumn(name = "user_id"),  // Kolumna z encji ApplicationUser
-            inverseJoinColumns = @JoinColumn(name = "role_id")  // Kolumna z encji Role (przykładowa nazwa, dostosuj do faktycznej nazwy kolumny)
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<Role> authorities;
+    private Set<Role> authorities = new HashSet<>();
 
-
-    public ApplicationUser(){
-        super();
-        this.authorities = new HashSet<Role>();
-    }
-
-    public ApplicationUser(Integer userId, String username, String email,String password, Set<Role> authorities){
-        super();
-        this.userId = userId;
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.authorities = authorities;
-    }
-
-
-    public Integer getUserId(){
-        return this.userId;
-    }
-    public void setUserId(Integer userId){
-        this.userId = userId;
-    }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.authorities;
-    }
-
-    public void setAuthorities(Set<Role> authorities){
-        this.authorities = authorities;
-    }
-
-    @Override
-    public String getPassword() {
-        return this.password;
-    }
-
-    public void setPassword(String password){
-        this.password = password;
-    }
-
-    @Override
-    public String getUsername() {
-        return this.username;
-    }
-
-    public void setUsername(String username){
-        this.username = username;
     }
 
     @Override
