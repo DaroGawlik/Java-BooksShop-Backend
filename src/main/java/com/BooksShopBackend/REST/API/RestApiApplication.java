@@ -1,9 +1,11 @@
 package com.BooksShopBackend.REST.API;
 
-import com.BooksShopBackend.REST.API.models.ApplicationUser;
-import com.BooksShopBackend.REST.API.models.Role;
-import com.BooksShopBackend.REST.API.repository.RoleRepository;
-import com.BooksShopBackend.REST.API.repository.UserRepository;
+import com.BooksShopBackend.REST.API.models.UserApplication;
+import com.BooksShopBackend.REST.API.models.UserApplicationDetails;
+import com.BooksShopBackend.REST.API.models.UserRole;
+import com.BooksShopBackend.REST.API.repositories.RoleRepository;
+import com.BooksShopBackend.REST.API.repositories.UserDetailRepository;
+import com.BooksShopBackend.REST.API.repositories.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,21 +23,21 @@ public class RestApiApplication {
 	}
 
 	@Bean
-	CommandLineRunner run (RoleRepository roleRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
-
+	CommandLineRunner run (RoleRepository roleRepository, UserRepository userRepository, UserDetailRepository userDetailRepository, PasswordEncoder passwordEncoder) {
 		//	CommandLineRunner run która jest wywoływana po uruchomieniu aplikacji Spring Boot. Ten interfejs jest często wykorzystywany
 		//	do definiowania kodu, który powinien być wykonany tuż po uruchomieniu aplikacji.
 		return args ->{
 			if(roleRepository.findByAuthority("ADMIN").isPresent()) return;
 
-			Role adminRole = roleRepository.save(new Role("ADMIN"));
-			roleRepository.save(new Role("USER"));
-			Set<Role> roles = new HashSet<>();
+			UserRole adminRole = roleRepository.save(new UserRole("ADMIN"));
+			roleRepository.save(new UserRole("USER"));
+			Set<UserRole> roles = new HashSet<>();
 			roles.add(adminRole);
 
-			ApplicationUser admin = new ApplicationUser(1, "admin", "admin@email.com",passwordEncoder.encode("password"), roles);
-
+			UserApplication admin = new UserApplication(1, "admin@email.com",passwordEncoder.encode("password"), roles);
+			UserApplicationDetails adminDetail = new UserApplicationDetails("admin");
 			userRepository.save(admin);
+			userDetailRepository.save(adminDetail);
 		};
 	}
 }

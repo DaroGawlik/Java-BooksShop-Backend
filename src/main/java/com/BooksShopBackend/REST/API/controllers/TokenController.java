@@ -1,4 +1,4 @@
-package com.BooksShopBackend.REST.API.controller;
+package com.BooksShopBackend.REST.API.controllers;
 
 import com.BooksShopBackend.REST.API.Services.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;

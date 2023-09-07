@@ -1,10 +1,9 @@
 package com.BooksShopBackend.REST.API.Services;
 
 
-import com.BooksShopBackend.REST.API.models.ApplicationUser;
-import com.BooksShopBackend.REST.API.repository.UserRepository;
+import com.BooksShopBackend.REST.API.models.UserApplication;
+import com.BooksShopBackend.REST.API.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,7 +22,7 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        ApplicationUser user = userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        UserApplication user = userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), user.getAuthorities());
     }

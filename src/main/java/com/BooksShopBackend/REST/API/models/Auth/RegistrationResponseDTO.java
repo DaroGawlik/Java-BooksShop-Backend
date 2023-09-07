@@ -1,39 +1,27 @@
-package com.BooksShopBackend.REST.API.models;
+package com.BooksShopBackend.REST.API.models.Auth;
 
-import java.util.Optional;
-
-public class LoginResponseDTO {
-    private String userId;
-    private String username;
+public class RegistrationResponseDTO {
+    private Integer userId;
     private String idToken;
     private String refreshToken;
     private final String expiresIn = "3600";
 
-    public LoginResponseDTO() {
+    public RegistrationResponseDTO() {
         super();
     }
 
-    public LoginResponseDTO(String userId, String username, String idToken, String refreshToken) {
-        this.userId = userId;
-        this.username = username;
+    public RegistrationResponseDTO(String idToken, String refreshToken) {
+        super();
         this.idToken = idToken;
         this.refreshToken = refreshToken;
     }
 
-    public String getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getIdToken() {

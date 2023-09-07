@@ -1,11 +1,13 @@
 package com.BooksShopBackend.REST.API.utils;
 
+import lombok.Getter;
 import org.springframework.stereotype.Component;
 
 import java.security.KeyPair;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
+@Getter
 @Component
 public class RSAKeyProperties {
 
@@ -18,19 +20,11 @@ public class RSAKeyProperties {
         this.privateKey = (RSAPrivateKey) pair.getPrivate();
     }
 
-    public RSAPublicKey getPublicKey(){
-        return this.publicKey;
+    public void setPublicKey(RSAPublicKey publicKey){
+        this.publicKey = publicKey;
     }
 
-//    public void setPublicKey(RSAPublicKey publicKey){
-//        this.publicKey = publicKey;
-//    }
-
-    public RSAPrivateKey getPrivateKey(){
-        return this.privateKey;
+    public void setPrivateKey(RSAPrivateKey privateKey){
+        this.privateKey = privateKey;
     }
-
-//    public void setPrivateKey(RSAPrivateKey privateKey){
-//        this.privateKey = privateKey;
-//    }
 }

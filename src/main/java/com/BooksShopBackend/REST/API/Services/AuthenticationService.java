@@ -1,14 +1,18 @@
 package com.BooksShopBackend.REST.API.Services;
 
 import com.BooksShopBackend.REST.API.models.*;
+import com.BooksShopBackend.REST.API.models.Auth.LoginResponseDTO;
+import com.BooksShopBackend.REST.API.models.Auth.RegistrationResponseDTO;
 import com.BooksShopBackend.REST.API.models.Errors.ApplicationError;
-import com.BooksShopBackend.REST.API.repository.RoleRepository;
-import com.BooksShopBackend.REST.API.repository.UserRepository;
+import com.BooksShopBackend.REST.API.repositories.RoleRepository;
+import com.BooksShopBackend.REST.API.repositories.UserDetailRepository;
+import com.BooksShopBackend.REST.API.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +29,9 @@ public class AuthenticationService {
     private UserRepository userRepository;
 
     @Autowired
+    private UserDetailRepository userDetailRepository;
+
+    @Autowired
     private RoleRepository roleRepository;
 
     @Autowired
@@ -39,34 +46,37 @@ public class AuthenticationService {
 
     public RegistrationResponseDTO registerUser(String username, String email, String password) {
         String encodedPassword = passwordEncoder.encode(password);
-        Role userRole = roleRepository.findByAuthority("USER").get();
+        UserRole userRole = roleRepository.findByAuthority("USER").get();
 
-        Set<Role> authorities = new HashSet<>();
+        Set<UserRole> authorities = new HashSet<>();
         authorities.add(userRole);
 
-        ApplicationUser registeredUser = userRepository.save(new ApplicationUser(0, username, email, encodedPassword, authorities));
+        UserApplication registeredUser = userRepository.save(new UserApplication(0, email, encodedPassword, authorities));
 
-        Authentication auth = new UsernamePasswordAuthenticationToken(username, password);
+        UserApplicationDetails userApplicationDetails = new UserApplicationDetails(username);
+        userApplicationDetails.setUserApplication(registeredUser); // Przypisz instancję UserApplication do UserApplicationDetails
+        userDetailRepository.save(userApplicationDetails); // Użyj odpowiedniego repozytorium, zakładając, że to jest userDetailRepository
+
+        Authentication auth = new UsernamePasswordAuthenticationToken(email, password);
 
         String idToken = tokenService.generateJwt(auth);
         String refreshToken = tokenService.generateRefreshToken();
 
         RegistrationResponseDTO responseDTO = new RegistrationResponseDTO();
-        responseDTO.setUserId(registeredUser.getUserId().toString());
-        responseDTO.setUsername(registeredUser.getUsername());
+        responseDTO.setUserId(registeredUser.getUserId());
         responseDTO.setIdToken(idToken);
         responseDTO.setRefreshToken(refreshToken);
 
         return responseDTO;
     }
 
+
     public LoginResponseDTO loginUser(String email, String password) {
         Authentication auth = authenticateUser(email, password);
-        ApplicationUser loginUser = getUserByEmail(email);
+        UserApplication loginUser = getUserByEmail(email);
 
         LoginResponseDTO responseDTO = new LoginResponseDTO();
-        responseDTO.setUserId(loginUser.getUserId().toString());
-        responseDTO.setUsername(loginUser.getUsername());
+        responseDTO.setUserId(loginUser.getUserId());
         responseDTO.setIdToken(tokenService.generateJwt(auth));
         responseDTO.setRefreshToken(tokenService.generateRefreshToken());
 
@@ -81,14 +91,13 @@ public class AuthenticationService {
         }
     }
 
-    private ApplicationUser getUserByEmail(String email) {
+    private UserApplication getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApplicationError("User not found for email: " + email));
     }
 
-
     public boolean deleteUser(Integer userId){
-            Optional<ApplicationUser> userByUserId = userRepository.findByUserId(userId);
+            Optional<UserApplication> userByUserId = userRepository.findByUserId(userId);
             if (userByUserId.isPresent()) {
                 userRepository.delete(userByUserId.get());
                 return true;
