@@ -44,7 +44,7 @@ public class AuthenticationService {
     private TokenService tokenService;
 
 
-    public RegistrationResponseDTO registerUser(String username, String email, String password) {
+    public RegistrationResponseDTO registerUser(String userName, String email, String password) {
         String encodedPassword = passwordEncoder.encode(password);
         UserRole userRole = roleRepository.findByAuthority("USER").get();
 
@@ -53,9 +53,9 @@ public class AuthenticationService {
 
         UserApplication registeredUser = userRepository.save(new UserApplication(0, email, encodedPassword, authorities));
 
-        UserApplicationDetails userApplicationDetails = new UserApplicationDetails(username);
-        userApplicationDetails.setUserApplication(registeredUser); // Przypisz instancję UserApplication do UserApplicationDetails
-        userDetailRepository.save(userApplicationDetails); // Użyj odpowiedniego repozytorium, zakładając, że to jest userDetailRepository
+        UserApplicationDetails userApplicationDetails = new UserApplicationDetails(userName);
+        userApplicationDetails.setUserApplication(registeredUser);
+        userDetailRepository.save(userApplicationDetails);
 
         Authentication auth = new UsernamePasswordAuthenticationToken(email, password);
 

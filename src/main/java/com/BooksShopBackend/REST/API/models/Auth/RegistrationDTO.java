@@ -1,7 +1,7 @@
 package com.BooksShopBackend.REST.API.models.Auth;
 
 public class RegistrationDTO {
-    private String username;
+    private String userName;
     private String email;
     private String password;
 
@@ -12,20 +12,20 @@ public class RegistrationDTO {
         super();
     }
 
-    public RegistrationDTO(String username, String email, String password, Boolean returnSecureToken){
+    public RegistrationDTO(String userName, String email, String password, Boolean returnSecureToken){
         super();
-        this.username = username;
+        this.userName = userName;
         this.email = email;
         this.password = password;
         this.returnSecureToken = returnSecureToken;
     }
 
-    public String getUsername(){
-        return this.username;
+    public String getUserName(){
+        return this.userName;
     }
 
-    public void setUsername(String username){
-        this.username = username;
+    public void setUserName(String userName){
+        this.userName = userName;
     }
 
 
@@ -47,7 +47,7 @@ public class RegistrationDTO {
         this.returnSecureToken = returnSecureToken;
     }
     public String toString(){
-        return "Registration info: username: " + this.username + " password: " + this.password;
+        return "Registration info: username: " + this.userName + " password: " + this.password;
     }
 
 

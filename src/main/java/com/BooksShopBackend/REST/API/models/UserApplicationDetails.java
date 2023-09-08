@@ -16,16 +16,16 @@ public class UserApplicationDetails {
     @Column(name = "user_id")
     private Integer userId;
 
-    @Column(nullable = false, unique = true)
-    private String username;
+    @Column(nullable = false)
+    private String userName;
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "user_id")
     private UserApplication userApplication;
 
-    public UserApplicationDetails(String username) {
-        this.username = username;
+    public UserApplicationDetails(String userName) {
+        this.userName = userName;
     }
 }
 

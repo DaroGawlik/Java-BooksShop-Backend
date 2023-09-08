@@ -1,14 +1,17 @@
 package com.BooksShopBackend.REST.API.models.account;
 
-public class UserDataDetailResponseDTO {
+import lombok.Getter;
+
+@Getter
+public class UserDataUpdateUserNameDTO {
 
     private String userName;
 
-    public UserDataDetailResponseDTO() {
+    public UserDataUpdateUserNameDTO() {
         super();
     }
 
-    public UserDataDetailResponseDTO(String userName) {
+    public UserDataUpdateUserNameDTO(String userName) {
         this.userName = userName;
     }
 
@@ -16,7 +19,4 @@ public class UserDataDetailResponseDTO {
         this.userName = userName;
     }
 
-    public String getUserName() {
-        return userName;
-    }
 }

@@ -44,7 +44,7 @@ public class AuthenticationController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
         }
         try {
-            RegistrationResponseDTO response = authenticationService.registerUser(body.getUsername(), body.getEmail(), body.getPassword());
+            RegistrationResponseDTO response = authenticationService.registerUser(body.getUserName(), body.getEmail(), body.getPassword());
             return ResponseEntity.ok(response);
         } catch (ApplicationError e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
@@ -76,6 +76,7 @@ public class AuthenticationController {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with the provided ID was not found.");
     }
+
 }
 
 
