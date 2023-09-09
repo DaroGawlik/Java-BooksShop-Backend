@@ -32,8 +32,7 @@ public class TokenService {
     @Autowired
     private JwtDecoder jwtDecoder;
 
-    public String generateJwt(Authentication auth){
-
+    public String generateJwt(Authentication auth) {
         Instant now = Instant.now();
 
         String scope = auth.getAuthorities().stream()
@@ -50,8 +49,6 @@ public class TokenService {
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
 
-
-
     public String generateRefreshToken() {
         SecureRandom secureRandom = new SecureRandom();
         byte[] refreshTokenBytes = new byte[64];
@@ -60,3 +57,4 @@ public class TokenService {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(refreshTokenBytes);
     }
 }
+

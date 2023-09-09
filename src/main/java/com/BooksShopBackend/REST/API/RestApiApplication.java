@@ -21,23 +21,24 @@ public class RestApiApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(RestApiApplication.class, args);
 	}
-
 	@Bean
-	CommandLineRunner run (RoleRepository roleRepository, UserRepository userRepository, UserDetailRepository userDetailRepository, PasswordEncoder passwordEncoder) {
+	CommandLineRunner run(RoleRepository roleRepository, UserRepository userRepository, UserDetailRepository userDetailRepository,
+						  PasswordEncoder passwordEncoder) {
 		//	CommandLineRunner run która jest wywoływana po uruchomieniu aplikacji Spring Boot. Ten interfejs jest często wykorzystywany
-		//	do definiowania kodu, który powinien być wykonany tuż po uruchomieniu aplikacji.
-		return args ->{
-			if(roleRepository.findByAuthority("ADMIN").isPresent()) return;
+				//	do definiowania kodu, który powinien być wykonany tuż po uruchomieniu aplikacji.
+		return args -> {
+			if (roleRepository.findByAuthority("ADMIN").isPresent()) return;
 
 			UserRole adminRole = roleRepository.save(new UserRole("ADMIN"));
 			roleRepository.save(new UserRole("USER"));
 			Set<UserRole> roles = new HashSet<>();
 			roles.add(adminRole);
 
-			UserApplication admin = new UserApplication(1, "admin@email.com",passwordEncoder.encode("password"), roles);
-			UserApplicationDetails adminDetail = new UserApplicationDetails("admin");
-			userRepository.save(admin);
-			userDetailRepository.save(adminDetail);
+			UserApplication registeredAdmin = userRepository.save(new UserApplication(0, "admin@email.com", passwordEncoder.encode("password"), roles));
+
+			UserApplicationDetails userApplicationDetails = new UserApplicationDetails("admin");
+			userApplicationDetails.setUserApplication(registeredAdmin);
+			userDetailRepository.save(userApplicationDetails);
 		};
 	}
 }

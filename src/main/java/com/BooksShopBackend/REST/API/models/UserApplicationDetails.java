@@ -3,6 +3,7 @@ package com.BooksShopBackend.REST.API.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.stereotype.Component;
 
 @Entity
 @Table(name = "user_details")

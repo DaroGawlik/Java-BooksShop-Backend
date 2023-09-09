@@ -21,8 +21,6 @@ import java.util.*;
 
 @Service
 @Transactional
-//Transakcje są mechanizmem, który pozwala grupować operacje na bazie danych w jedną jednostkę,
-//co gwarantuje, że albo wszystkie operacje zostaną wykonane poprawnie, albo żadna z nich nie zostanie wykonana.
 public class AuthenticationService {
 
     @Autowired
@@ -43,16 +41,14 @@ public class AuthenticationService {
     @Autowired
     private TokenService tokenService;
 
-
     public RegistrationResponseDTO registerUser(String userName, String email, String password) {
         String encodedPassword = passwordEncoder.encode(password);
-        UserRole userRole = roleRepository.findByAuthority("USER").get();
 
+        UserRole userRole = roleRepository.findByAuthority("USER").get();
         Set<UserRole> authorities = new HashSet<>();
         authorities.add(userRole);
 
         UserApplication registeredUser = userRepository.save(new UserApplication(0, email, encodedPassword, authorities));
-
         UserApplicationDetails userApplicationDetails = new UserApplicationDetails(userName);
         userApplicationDetails.setUserApplication(registeredUser);
         userDetailRepository.save(userApplicationDetails);
@@ -69,8 +65,6 @@ public class AuthenticationService {
 
         return responseDTO;
     }
-
-
     public LoginResponseDTO loginUser(String email, String password) {
         Authentication auth = authenticateUser(email, password);
         UserApplication loginUser = getUserByEmail(email);
@@ -82,7 +76,6 @@ public class AuthenticationService {
 
         return responseDTO;
     }
-
     private Authentication authenticateUser(String email, String password) {
         try {
             return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
@@ -90,18 +83,16 @@ public class AuthenticationService {
             throw new ApplicationError("Invalid email or password");
         }
     }
-
     private UserApplication getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApplicationError("User not found for email: " + email));
     }
-
-    public boolean deleteUser(Integer userId){
-            Optional<UserApplication> userByUserId = userRepository.findByUserId(userId);
-            if (userByUserId.isPresent()) {
-                userRepository.delete(userByUserId.get());
-                return true;
-            }
-            return false;
-        }
+    public boolean deleteUser(Integer userId) {
+        Optional<UserApplication> userByUserId = userRepository.findByUserId(userId);
+        userByUserId.ifPresent(user -> {
+            userDetailRepository.findByUserId(userId).ifPresent(userDetailRepository::delete);
+            userRepository.delete(user);
+        });
+        return userByUserId.isPresent();
+    }
 }
