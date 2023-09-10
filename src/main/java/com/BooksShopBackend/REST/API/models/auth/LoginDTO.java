@@ -1,4 +1,4 @@
-package com.BooksShopBackend.REST.API.models.Auth;
+package com.BooksShopBackend.REST.API.models.auth;
 
 public class LoginDTO {
     private String email;

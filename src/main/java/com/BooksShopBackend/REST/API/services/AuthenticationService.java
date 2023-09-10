@@ -1,9 +1,11 @@
-package com.BooksShopBackend.REST.API.Services;
+package com.BooksShopBackend.REST.API.services;
 
-import com.BooksShopBackend.REST.API.models.*;
-import com.BooksShopBackend.REST.API.models.Auth.LoginResponseDTO;
-import com.BooksShopBackend.REST.API.models.Auth.RegistrationResponseDTO;
-import com.BooksShopBackend.REST.API.models.Errors.ApplicationError;
+import com.BooksShopBackend.REST.API.models.auth.LoginResponseDTO;
+import com.BooksShopBackend.REST.API.models.auth.RegistrationResponseDTO;
+import com.BooksShopBackend.REST.API.models.dataBase.UserApplication;
+import com.BooksShopBackend.REST.API.models.dataBase.UserApplicationDetails;
+import com.BooksShopBackend.REST.API.models.dataBase.UserRole;
+import com.BooksShopBackend.REST.API.models.errors.ApplicationError;
 import com.BooksShopBackend.REST.API.repositories.RoleRepository;
 import com.BooksShopBackend.REST.API.repositories.UserDetailRepository;
 import com.BooksShopBackend.REST.API.repositories.UserRepository;
@@ -12,7 +14,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

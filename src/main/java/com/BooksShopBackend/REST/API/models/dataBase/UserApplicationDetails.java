@@ -1,9 +1,9 @@
-package com.BooksShopBackend.REST.API.models;
+package com.BooksShopBackend.REST.API.models.dataBase;
 
 
+import com.BooksShopBackend.REST.API.models.dataBase.UserApplication;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.stereotype.Component;
 
 @Entity
 @Table(name = "user_details")

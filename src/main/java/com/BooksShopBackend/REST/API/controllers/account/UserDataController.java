@@ -1,9 +1,9 @@
 package com.BooksShopBackend.REST.API.controllers.account;
 
-import com.BooksShopBackend.REST.API.Services.UserDataService;
-import com.BooksShopBackend.REST.API.models.Errors.ApplicationError;
-import com.BooksShopBackend.REST.API.models.Errors.InvalidCredentialsError;
-import com.BooksShopBackend.REST.API.models.Errors.UserNotFoundError;
+import com.BooksShopBackend.REST.API.services.UserDataService;
+import com.BooksShopBackend.REST.API.models.errors.ApplicationError;
+import com.BooksShopBackend.REST.API.models.errors.InvalidCredentialsError;
+import com.BooksShopBackend.REST.API.models.errors.UserNotFoundError;
 import com.BooksShopBackend.REST.API.models.account.UserDataDetailResponseDTO;
 import com.BooksShopBackend.REST.API.models.account.UserDataUpdateUserNameDTO;
 import com.BooksShopBackend.REST.API.repositories.UserDetailRepository;

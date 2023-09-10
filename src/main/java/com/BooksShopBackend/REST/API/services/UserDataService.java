@@ -1,7 +1,7 @@
-package com.BooksShopBackend.REST.API.Services;
+package com.BooksShopBackend.REST.API.services;
 
-import com.BooksShopBackend.REST.API.models.Errors.UserNotFoundError;
-import com.BooksShopBackend.REST.API.models.UserApplicationDetails;
+import com.BooksShopBackend.REST.API.models.errors.UserNotFoundError;
+import com.BooksShopBackend.REST.API.models.dataBase.UserApplicationDetails;
 import com.BooksShopBackend.REST.API.models.account.UserDataDetailResponseDTO;
 import com.BooksShopBackend.REST.API.models.account.UserDataUpdateUserNameDTO;
 import com.BooksShopBackend.REST.API.repositories.UserDetailRepository;

@@ -1,4 +1,4 @@
-package com.BooksShopBackend.REST.API.Services;
+package com.BooksShopBackend.REST.API.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -9,19 +9,12 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.util.Base64;
-import java.util.Collection;
-import java.util.Date;
 import java.util.stream.Collectors;
 
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import java.time.Instant;
-import javax.crypto.SecretKey;
-import io.jsonwebtoken.security.Keys;
-
 
 
 @Service

@@ -1,7 +1,7 @@
-package com.BooksShopBackend.REST.API.Services;
+package com.BooksShopBackend.REST.API.services;
 
 
-import com.BooksShopBackend.REST.API.models.UserApplication;
+import com.BooksShopBackend.REST.API.models.dataBase.UserApplication;
 import com.BooksShopBackend.REST.API.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

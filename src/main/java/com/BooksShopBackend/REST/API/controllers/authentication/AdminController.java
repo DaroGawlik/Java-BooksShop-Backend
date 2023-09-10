@@ -1,4 +1,4 @@
-package com.BooksShopBackend.REST.API.controllers;
+package com.BooksShopBackend.REST.API.controllers.authentication;
 
 
 import org.springframework.web.bind.annotation.CrossOrigin;

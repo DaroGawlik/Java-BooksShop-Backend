@@ -1,4 +1,4 @@
-package com.BooksShopBackend.REST.API.models;
+package com.BooksShopBackend.REST.API.models.dataBase;
 
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;

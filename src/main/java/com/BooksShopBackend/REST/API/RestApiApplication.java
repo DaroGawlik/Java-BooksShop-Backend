@@ -1,8 +1,8 @@
 package com.BooksShopBackend.REST.API;
 
-import com.BooksShopBackend.REST.API.models.UserApplication;
-import com.BooksShopBackend.REST.API.models.UserApplicationDetails;
-import com.BooksShopBackend.REST.API.models.UserRole;
+import com.BooksShopBackend.REST.API.models.dataBase.UserApplication;
+import com.BooksShopBackend.REST.API.models.dataBase.UserApplicationDetails;
+import com.BooksShopBackend.REST.API.models.dataBase.UserRole;
 import com.BooksShopBackend.REST.API.repositories.RoleRepository;
 import com.BooksShopBackend.REST.API.repositories.UserDetailRepository;
 import com.BooksShopBackend.REST.API.repositories.UserRepository;

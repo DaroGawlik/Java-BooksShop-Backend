@@ -1,13 +1,13 @@
-package com.BooksShopBackend.REST.API.controllers;
+package com.BooksShopBackend.REST.API.controllers.authentication;
 
-import com.BooksShopBackend.REST.API.Services.AuthenticationService;
-import com.BooksShopBackend.REST.API.models.Auth.LoginDTO;
-import com.BooksShopBackend.REST.API.models.Auth.LoginResponseDTO;
-import com.BooksShopBackend.REST.API.models.Auth.RegistrationDTO;
-import com.BooksShopBackend.REST.API.models.Auth.RegistrationResponseDTO;
-import com.BooksShopBackend.REST.API.models.Errors.ApplicationError;
-import com.BooksShopBackend.REST.API.models.Errors.InvalidCredentialsError;
-import com.BooksShopBackend.REST.API.models.Errors.UserNotFoundError;
+import com.BooksShopBackend.REST.API.services.AuthenticationService;
+import com.BooksShopBackend.REST.API.models.auth.LoginDTO;
+import com.BooksShopBackend.REST.API.models.auth.LoginResponseDTO;
+import com.BooksShopBackend.REST.API.models.auth.RegistrationDTO;
+import com.BooksShopBackend.REST.API.models.auth.RegistrationResponseDTO;
+import com.BooksShopBackend.REST.API.models.errors.ApplicationError;
+import com.BooksShopBackend.REST.API.models.errors.InvalidCredentialsError;
+import com.BooksShopBackend.REST.API.models.errors.UserNotFoundError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,17 +1,17 @@
-package com.BooksShopBackend.REST.API.models.Auth;
+package com.BooksShopBackend.REST.API.models.auth;
 
-public class RegistrationResponseDTO {
+public class LoginResponseDTO {
     private Integer userId;
     private String idToken;
     private String refreshToken;
     private final String expiresIn = "3600";
 
-    public RegistrationResponseDTO() {
+    public LoginResponseDTO() {
         super();
     }
 
-    public RegistrationResponseDTO(String idToken, String refreshToken) {
-        super();
+    public LoginResponseDTO(Integer userId, String idToken, String refreshToken) {
+        this.userId = userId;
         this.idToken = idToken;
         this.refreshToken = refreshToken;
     }
