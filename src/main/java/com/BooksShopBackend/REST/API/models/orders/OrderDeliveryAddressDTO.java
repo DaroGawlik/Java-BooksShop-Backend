@@ -2,7 +2,11 @@ package com.BooksShopBackend.REST.API.models.orders;
 
 import lombok.Getter;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Getter
+@Setter
 public class OrderDeliveryAddressDTO {
     private String street;
     private String houseNumber;

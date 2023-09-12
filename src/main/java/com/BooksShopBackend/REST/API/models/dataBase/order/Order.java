@@ -25,6 +25,14 @@ public class Order {
     @JoinColumn(name = "user_id")
     private UserApplication user;
 
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+    private OrderData orderData;
+
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+    private OrderDeliveryAddress orderDeliveryAddress;
+
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+    private OrderAdditional orderAdditional;
 }
 
 

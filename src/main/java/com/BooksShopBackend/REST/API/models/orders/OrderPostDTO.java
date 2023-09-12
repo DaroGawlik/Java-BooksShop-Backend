@@ -4,7 +4,11 @@ import lombok.Getter;
 
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Getter
+@Setter
 public class OrderPostDTO {
     private OrderDataDTO orderData;
     private List<OrderBooksDTO> books;
@@ -14,7 +18,6 @@ public class OrderPostDTO {
     private String additionalInformation;
     private List<String> gifts;
     private String paymentType;
-
 
     public void setOrderData(OrderDataDTO orderData) {
         this.orderData = orderData;

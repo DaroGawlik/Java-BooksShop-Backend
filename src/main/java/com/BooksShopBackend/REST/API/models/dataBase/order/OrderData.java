@@ -6,18 +6,30 @@ import jakarta.persistence.*;
 @Table(name = "OrderData")
 public class OrderData {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @OneToOne
+    @Column(name = "order_id")
+    private Integer orderId;
+
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "surname")
+    private String surname;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
     @JoinColumn(name = "order_id")
     private Order order;
 
-    @Column(name = "name")
-    private String name; // Dodana kolumna "author"
+    public void setOrder(Order order) {
+        this.order = order;
+    }
+    public Integer getOrderId() {
+        return orderId;
+    }
 
-    @Column(name = "surname")
-    private String surname; // Dodana kolumna "title"
-
-    // Gettery i settery dla nowych pól
+    public void setOrderId(Integer orderId) {
+        this.orderId = orderId;
+    }
 
     public String getName() {
         return name;
@@ -34,4 +46,6 @@ public class OrderData {
     public void setSurname(String surname) {
         this.surname = surname;
     }
+
+
 }
