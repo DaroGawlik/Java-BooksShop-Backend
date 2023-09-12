@@ -20,7 +20,7 @@ public class OrderController {
     public ResponseEntity<?> OrderPost(@PathVariable Integer userId, @RequestBody OrderPostDTO body){
         System.out.println("Received request body: " + body);
 
-        String orderReposne  = orderService.OrderPost(body);
-        return ResponseEntity.ok(orderReposne);
+        String orderResponse  = orderService.OrderPost(userId, body);
+        return ResponseEntity.ok(orderResponse);
     }
 }
