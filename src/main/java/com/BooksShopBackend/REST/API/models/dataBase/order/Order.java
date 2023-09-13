@@ -33,6 +33,9 @@ public class Order {
 
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
     private OrderAdditional orderAdditional;
+
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+    private OrderGifts orderGifts;
 }
 
 

@@ -23,7 +23,6 @@ public class OrderRestDTO {
     public void setAdditionalInformation(String additionalInformation) {
         this.additionalInformation = additionalInformation;
     }
-
     public void setGifts(List<String> gifts) {
         this.gifts = gifts;
     }

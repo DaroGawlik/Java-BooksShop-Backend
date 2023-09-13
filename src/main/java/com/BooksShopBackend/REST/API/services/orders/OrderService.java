@@ -2,10 +2,7 @@ package com.BooksShopBackend.REST.API.services.orders;
 
 
 import com.BooksShopBackend.REST.API.models.dataBase.UserApplication;
-import com.BooksShopBackend.REST.API.models.dataBase.order.Order;
-import com.BooksShopBackend.REST.API.models.dataBase.order.OrderAdditional;
-import com.BooksShopBackend.REST.API.models.dataBase.order.OrderData;
-import com.BooksShopBackend.REST.API.models.dataBase.order.OrderDeliveryAddress;
+import com.BooksShopBackend.REST.API.models.dataBase.order.*;
 import com.BooksShopBackend.REST.API.models.orders.OrderDataDTO;
 import com.BooksShopBackend.REST.API.models.orders.OrderDeliveryAddressDTO;
 import com.BooksShopBackend.REST.API.models.orders.OrderPostDTO;
@@ -20,7 +17,10 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 @Service
 @Transactional
@@ -79,25 +79,58 @@ public class OrderService {
 
             orderAdditional.setAdditionalInformation(body.getAdditionalInformation());
 
+            orderAdditional.setPaymentType((body.getPaymentType()));
 
 
-            // Przypisanie obiektu OrderData do Order
-            newOrder.setOrderData(orderData);
-            orderData.setOrder(newOrder);
+            List<String> selectedGifts = body.getGifts();
+            OrderGifts orderGifts = new OrderGifts();
 
-            // Przypisanie obiektu OrderDeliveryAddress do Order
-            newOrder.setOrderDeliveryAddress(orderDeliveryAddress);
-            orderDeliveryAddress.setOrder(newOrder);
+            Map<String, String> giftColumnMapping = Map.of(
+                    "Pack as a gift", "TRUE",
+                    "Add postcard", "TRUE",
+                    "Provide 2% discount to the next time", "TRUE",
+                    "Branded pen or pencil", "TRUE"
+            );
 
-            newOrder.setOrderAdditional(orderAdditional);
-            orderAdditional.setOrder(newOrder);
+            for (String gift : selectedGifts) {
+                if (giftColumnMapping.containsKey(gift)) {
+                    switch (gift) {
+                        case "Pack as a gift":
+                            orderGifts.setGift1(giftColumnMapping.get(gift));
+                            break;
+                        case "Add postcard":
+                            orderGifts.setGift2(giftColumnMapping.get(gift));
+                            break;
+                        case "Provide 2% discount to the next time":
+                            orderGifts.setGift3(giftColumnMapping.get(gift));
+                            break;
+                        case "Branded pen or pencil":
+                            orderGifts.setGift4(giftColumnMapping.get(gift));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+                // Przypisanie obiektu OrderData do Order
+                newOrder.setOrderData(orderData);
+                orderData.setOrder(newOrder);
 
-            // Zapis obiektu Order, co spowoduje automatycznie zapis obiektów OrderData i OrderDeliveryAddress
-            orderRepository.save(newOrder);
+                // Przypisanie obiektu OrderDeliveryAddress do Order
+                newOrder.setOrderDeliveryAddress(orderDeliveryAddress);
+                orderDeliveryAddress.setOrder(newOrder);
 
-            return "Order accepted and registered under ID: " + orderId;
+                newOrder.setOrderAdditional(orderAdditional);
+                orderAdditional.setOrder(newOrder);
+
+                newOrder.setOrderGifts(orderGifts);
+                orderGifts.setOrder(newOrder);
+
+                // Zapis obiektu Order, co spowoduje automatycznie zapis obiektów OrderData i OrderDeliveryAddress
+                orderRepository.save(newOrder);
+
+                return "Order accepted and registered under ID: " + orderId;
+            }
+            return "User with the provided userId does not exist";
         }
-        return "User with the provided userId does not exist";
     }
-
-}

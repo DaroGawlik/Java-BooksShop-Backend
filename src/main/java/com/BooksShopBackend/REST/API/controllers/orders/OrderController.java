@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
+
 @RestController
 @RequestMapping("/order/{userId}")
 @CrossOrigin("*")
@@ -17,7 +19,7 @@ public class OrderController {
 
 
     @PostMapping("/post")
-    public ResponseEntity<?> OrderPost(@PathVariable Integer userId, @RequestBody OrderPostDTO body){
+    public ResponseEntity<?> OrderPost(@PathVariable Integer userId, @RequestBody OrderPostDTO body) throws ParseException {
         System.out.println("Received request body: " + body);
 
         String orderResponse  = orderService.OrderPost(userId, body);
