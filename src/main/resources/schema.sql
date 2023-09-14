@@ -18,3 +18,13 @@ CREATE TABLE UsersAuth
 --    enabled       BOOLEAN DEFAULT FALSE,
     CONSTRAINT    UQ_UsersAuth_Email UNIQUE (e_mail)
 );
+
+
+DROP TABLE IF EXISTS booksLists;
+
+CREATE TABLE booksLists (
+    id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    author VARCHAR(255),
+    price DECIMAL(10, 2),
+    title VARCHAR(255)
+);

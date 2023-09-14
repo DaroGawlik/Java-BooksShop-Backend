@@ -1,6 +1,6 @@
 package com.BooksShopBackend.REST.API.utils;
 
-import com.BooksShopBackend.REST.API.models.dataBase.Books;
+import com.BooksShopBackend.REST.API.models.dataBase.BooksList;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.stereotype.Component;
@@ -12,10 +12,13 @@ import java.util.List;
 @Component
 public class JsonParser {
 
-    ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper = new ObjectMapper();
 
-    public List<Books> parseJsonToBooks(String jsonFilePath) throws IOException {
+    public List<BooksList> parseJsonToBooks(String jsonFilePath) throws IOException {
+        System.out.println("Parsing JSON file: " + jsonFilePath);
         File file = new File(jsonFilePath);
-        return objectMapper.readValue(file, new TypeReference<List<Books>>(){});
+        List<BooksList> booksListList = objectMapper.readValue(file, new TypeReference<List<BooksList>>(){});
+        System.out.println("Parsed " + booksListList.size() + " books from JSON.");
+        return booksListList;
     }
 }

@@ -1,32 +1,28 @@
 package com.BooksShopBackend.REST.API.models.dataBase;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
-@Table(name = "Books")
+@Table(name = "BooksList")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Books {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class BooksList {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "book_id")
     private Integer bookId;
 
-    @Column(name = "author")
     private String author;
 
-    @Column(name = "title")
     private String title;
 
-    @Column(name = "price")
     private Integer price;
-
 }
+

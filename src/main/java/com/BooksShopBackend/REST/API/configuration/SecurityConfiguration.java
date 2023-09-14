@@ -55,6 +55,7 @@ public class SecurityConfiguration {
                     auth.requestMatchers("/userData/**").permitAll();
                     auth.requestMatchers("/order/{userId}/**").permitAll();
                     auth.requestMatchers("/token/**").permitAll();
+                    auth.requestMatchers("/books/**").permitAll();
                     auth.requestMatchers("/admin/**").hasRole("ADMIN");
                     auth.requestMatchers("/user/**").hasAnyRole("ADMIN", "USER");
                     auth.anyRequest().authenticated();
