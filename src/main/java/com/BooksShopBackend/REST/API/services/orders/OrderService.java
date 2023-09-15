@@ -1,13 +1,17 @@
 package com.BooksShopBackend.REST.API.services.orders;
 
 
+import com.BooksShopBackend.REST.API.models.dataBase.BooksList;
 import com.BooksShopBackend.REST.API.models.dataBase.UserApplication;
 import com.BooksShopBackend.REST.API.models.dataBase.order.*;
 import com.BooksShopBackend.REST.API.models.orders.OrderDataDTO;
 import com.BooksShopBackend.REST.API.models.orders.OrderDeliveryAddressDTO;
 import com.BooksShopBackend.REST.API.models.orders.OrderPostDTO;
+import com.BooksShopBackend.REST.API.repositories.BookListRepository;
 import com.BooksShopBackend.REST.API.repositories.UserRepository;
+import com.BooksShopBackend.REST.API.repositories.orders.OrderBooksRepository;
 import com.BooksShopBackend.REST.API.repositories.orders.OrderRepository;
+import org.hibernate.validator.constraints.URL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,11 +20,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.*;
 
 @Service
 @Transactional
@@ -30,6 +30,12 @@ public class OrderService {
     private UserRepository userRepository;
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private BookListRepository bookListRepository;
+
+    @Autowired
+    private OrderBooksRepository orderBooksRepository;
 
 
     public String OrderPost(Integer userId, OrderPostDTO body) throws ParseException {
@@ -112,6 +118,8 @@ public class OrderService {
                     }
                 }
             }
+
+
                 // Przypisanie obiektu OrderData do Order
                 newOrder.setOrderData(orderData);
                 orderData.setOrder(newOrder);
@@ -122,6 +130,9 @@ public class OrderService {
 
                 newOrder.setOrderAdditional(orderAdditional);
                 orderAdditional.setOrder(newOrder);
+
+                newOrder.setOrderGifts(orderGifts);
+                orderGifts.setOrder(newOrder);
 
                 newOrder.setOrderGifts(orderGifts);
                 orderGifts.setOrder(newOrder);

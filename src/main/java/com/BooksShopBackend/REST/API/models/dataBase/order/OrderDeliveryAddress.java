@@ -3,7 +3,7 @@ package com.BooksShopBackend.REST.API.models.dataBase.order;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "DeliveryAddress")
+@Table(name = "OrderDeliveryAddress")
 public class OrderDeliveryAddress {
     @Id
     @Column(name = "order_id")
