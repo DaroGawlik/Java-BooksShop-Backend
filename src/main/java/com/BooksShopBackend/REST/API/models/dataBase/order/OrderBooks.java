@@ -23,4 +23,10 @@ public class OrderBooks {
     @Column(name = "book_id")
     private List<String> books_id;
 
+
+
+//    @ElementCollection
+//    @CollectionTable(name = "OrderBooks_Books", joinColumns = @JoinColumn(name = "order_books_id"))
+//    @Column(name = "book_id")
+//    private List<String> books_id;
 }
