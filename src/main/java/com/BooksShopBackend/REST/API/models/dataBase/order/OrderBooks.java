@@ -14,22 +14,11 @@ import java.util.List;
 public class OrderBooks {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
     @ManyToOne
     @JoinColumn(name = "order_id")
     private Order order;
 
-    @ElementCollection
-    @CollectionTable(name = "OrderBooks_Books", joinColumns = @JoinColumn(name = "order_books_id"))
-    @Column(name = "book_id")
-    private List<String> books_id;
-
-//    @ElementCollection
-//    @CollectionTable(name = "OrderBooks_Books", joinColumns = @JoinColumn(name = "order_books_id"))
-//    @Column(name = "book_id")
-//    private List<String> books_id;
-
-//    @ElementCollection
-//    @CollectionTable(name = "OrderBooks_Books", joinColumns = @JoinColumn(name = "order_books_id"))
-//    @Column(name = "book_id")
-//    private List<String> books_id;
 }
