@@ -4,11 +4,13 @@ package com.BooksShopBackend.REST.API.services.orders;
 import com.BooksShopBackend.REST.API.models.dataBase.BooksList;
 import com.BooksShopBackend.REST.API.models.dataBase.UserApplication;
 import com.BooksShopBackend.REST.API.models.dataBase.order.*;
+import com.BooksShopBackend.REST.API.models.orders.OrderBooksDTO;
 import com.BooksShopBackend.REST.API.models.orders.OrderDataDTO;
 import com.BooksShopBackend.REST.API.models.orders.OrderDeliveryAddressDTO;
 import com.BooksShopBackend.REST.API.models.orders.OrderPostDTO;
 import com.BooksShopBackend.REST.API.repositories.BookListRepository;
 import com.BooksShopBackend.REST.API.repositories.UserRepository;
+//import com.BooksShopBackend.REST.API.repositories.orders.OrderBooksRepository;
 import com.BooksShopBackend.REST.API.repositories.orders.OrderBooksRepository;
 import com.BooksShopBackend.REST.API.repositories.orders.OrderRepository;
 import org.hibernate.validator.constraints.URL;
@@ -118,13 +120,31 @@ public class OrderService {
                     }
                 }
             }
+            List<OrderBooksDTO> selectedBooks = body.getBooks();
+            Optional<Order> orderOptional = orderRepository.findById(orderId);
+            Order order = orderOptional.get();
+            for (OrderBooksDTO bookInfo : selectedBooks) {
+                String author = bookInfo.getAuthor();
+                String title = bookInfo.getTitle();
+                Integer amount = bookInfo.getAmount();
 
+                Optional<BooksList> bookOptional = bookListRepository.findByAuthorAndTitle(author, title);
 
-                // Przypisanie obiektu OrderData do Order
+                if (bookOptional.isPresent()) {
+                    BooksList foundBook = bookOptional.get();
+                    OrderBooks orderBooks = new OrderBooks();
+                    orderBooks.setOrder(order); // Przypisz obiekt Order do pola order
+                    orderBooks.setBook(foundBook);
+                    orderBooks.setAmount(amount);
+                    orderBooksRepository.save(orderBooks); // Zapisz orderBooks w bazie danych
+                } else {
+                    return "Book with author " + author + " and title " + title + " not found";
+                }
+            }
+
                 newOrder.setOrderData(orderData);
                 orderData.setOrder(newOrder);
 
-                // Przypisanie obiektu OrderDeliveryAddress do Order
                 newOrder.setOrderDeliveryAddress(orderDeliveryAddress);
                 orderDeliveryAddress.setOrder(newOrder);
 
@@ -134,10 +154,7 @@ public class OrderService {
                 newOrder.setOrderGifts(orderGifts);
                 orderGifts.setOrder(newOrder);
 
-                newOrder.setOrderGifts(orderGifts);
-                orderGifts.setOrder(newOrder);
 
-                // Zapis obiektu Order, co spowoduje automatycznie zapis obiektów OrderData i OrderDeliveryAddress
                 orderRepository.save(newOrder);
 
                 return "Order accepted and registered under ID: " + orderId;

@@ -10,12 +10,8 @@ DROP TABLE IF EXISTS UsersAuth;
 CREATE TABLE UsersAuth
 (
     id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
---    username      VARCHAR(100) NOT NULL,
     e_mail        VARCHAR(100) NOT NULL,
     password      VARCHAR(255) NOT NULL,
---    non_locked    BOOLEAN DEFAULT TRUE,
---    created_date  DATETIME DEFAULT CURRENT_TIMESTAMP,
---    enabled       BOOLEAN DEFAULT FALSE,
     CONSTRAINT    UQ_UsersAuth_Email UNIQUE (e_mail)
 );
 
@@ -27,4 +23,13 @@ CREATE TABLE booksLists (
     author VARCHAR(255),
     price DECIMAL(10, 2),
     title VARCHAR(255)
+);
+
+
+CREATE TABLE OrderBooks (
+    order_id INT,
+    book_id INT,
+    amount INT,
+    FOREIGN KEY (order_id) REFERENCES Orders(id),
+    FOREIGN KEY (book_id) REFERENCES Books(id)
 );

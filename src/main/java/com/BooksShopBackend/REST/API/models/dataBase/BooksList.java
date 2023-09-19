@@ -1,9 +1,14 @@
 package com.BooksShopBackend.REST.API.models.dataBase;
 
 
+import com.BooksShopBackend.REST.API.models.dataBase.order.Order;
+import com.BooksShopBackend.REST.API.models.dataBase.order.OrderBooks;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "BooksList")
