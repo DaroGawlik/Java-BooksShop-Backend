@@ -25,4 +25,20 @@ public class OrderBooks {
 
     @Column(name = "amount")
     private Integer amount;
+
+//
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private Long id;
+//
+//    @ManyToOne
+//    @JoinColumn(name = "order_id")
+//    private Order order;
+//
+//    @ManyToOne
+//    @JoinColumn(name = "book_id")
+//    private BooksList book;
+//
+//    @Column(name = "amount")
+//    private Integer amount;
 }
