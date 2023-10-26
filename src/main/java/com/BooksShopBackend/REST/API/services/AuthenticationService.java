@@ -5,10 +5,16 @@ import com.BooksShopBackend.REST.API.models.auth.RegistrationResponseDTO;
 import com.BooksShopBackend.REST.API.models.dataBase.UserApplication;
 import com.BooksShopBackend.REST.API.models.dataBase.UserApplicationDetails;
 import com.BooksShopBackend.REST.API.models.dataBase.UserRole;
-import com.BooksShopBackend.REST.API.models.errors.ApplicationError;
+import com.BooksShopBackend.REST.API.models.dataBase.order.Order;
+import com.BooksShopBackend.REST.API.models.dataBase.order.OrderBooks;
+import com.BooksShopBackend.REST.API.models.errors.EmailAlreadyExistsExceptionError;
+import com.BooksShopBackend.REST.API.models.errors.UserNotFoundError;
+import com.BooksShopBackend.REST.API.models.errors.InvalidPasswordError;
 import com.BooksShopBackend.REST.API.repositories.RoleRepository;
 import com.BooksShopBackend.REST.API.repositories.UserDetailRepository;
 import com.BooksShopBackend.REST.API.repositories.UserRepository;
+import com.BooksShopBackend.REST.API.repositories.orders.OrderBooksRepository;
+import com.BooksShopBackend.REST.API.repositories.orders.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,6 +34,12 @@ public class AuthenticationService {
     private UserRepository userRepository;
 
     @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private OrderBooksRepository orderBooksRepository;
+
+    @Autowired
     private UserDetailRepository userDetailRepository;
 
     @Autowired
@@ -43,6 +55,10 @@ public class AuthenticationService {
     private TokenService tokenService;
 
     public RegistrationResponseDTO registerUser(String userName, String email, String password) {
+        UserApplication existingUser = getUserByEmail(email);
+        if (existingUser != null) {
+            throw new EmailAlreadyExistsExceptionError("Email address is already in use.");
+        }
         String encodedPassword = passwordEncoder.encode(password);
 
         UserRole userRole = roleRepository.findByAuthority("USER").get();
@@ -66,9 +82,15 @@ public class AuthenticationService {
 
         return responseDTO;
     }
+
     public LoginResponseDTO loginUser(String email, String password) {
-        Authentication auth = authenticateUser(email, password);
         UserApplication loginUser = getUserByEmail(email);
+
+        if (loginUser == null) {
+            throw new UserNotFoundError("User with this email does not exist.");
+        }
+
+        Authentication auth = authenticateUser(email, password);
 
         LoginResponseDTO responseDTO = new LoginResponseDTO();
         responseDTO.setUserId(loginUser.getUserId());
@@ -81,19 +103,33 @@ public class AuthenticationService {
         try {
             return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
         } catch (AuthenticationException e) {
-            throw new ApplicationError("Invalid email or password");
+            throw new InvalidPasswordError("Wrong password");
         }
     }
-    private UserApplication getUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new ApplicationError("User not found for email: " + email));
+    @Transactional
+    public void deleteUser(Integer userId) {
+        UserApplication user = getUserByUserId(userId);
+        if (user == null) {
+            throw new UserNotFoundError("User with the provided ID was not found.");
+        }
+
+        List<Order> userOrders = orderRepository.findByUserUserId(userId);
+        for (Order order : userOrders) {
+            List<OrderBooks> orderBooks = orderBooksRepository.findByOrder(order);
+            orderBooksRepository.deleteAll(orderBooks);
+        }
+
+        orderRepository.deleteAll(userOrders);
+
+        userDetailRepository.findByUserId(userId).ifPresent(userDetailRepository::delete);
+        userRepository.delete(user);
     }
-    public boolean deleteUser(Integer userId) {
-        Optional<UserApplication> userByUserId = userRepository.findByUserId(userId);
-        userByUserId.ifPresent(user -> {
-            userDetailRepository.findByUserId(userId).ifPresent(userDetailRepository::delete);
-            userRepository.delete(user);
-        });
-        return userByUserId.isPresent();
+
+    private UserApplication getUserByUserId(Integer userId) {
+        return userRepository.findByUserId(userId).orElse(null);
+    }
+
+    private UserApplication getUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
     }
 }
