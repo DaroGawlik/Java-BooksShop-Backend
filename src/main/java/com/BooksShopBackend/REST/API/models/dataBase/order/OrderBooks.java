@@ -29,6 +29,8 @@ public class OrderBooks {
     @Column(name = "amount")
     private Integer amount;
 
+
+
     @Column(name = "order_id", insertable = false, updatable = false, columnDefinition = "int")
     private Integer orderId; // Dodatkowa kolumna do zachowania relacji do zamówienia
 
