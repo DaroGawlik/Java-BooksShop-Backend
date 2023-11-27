@@ -4,14 +4,15 @@ package com.BooksShopBackend.REST.API.services.orders;
 import com.BooksShopBackend.REST.API.models.dataBase.BooksList;
 import com.BooksShopBackend.REST.API.models.dataBase.UserApplication;
 import com.BooksShopBackend.REST.API.models.dataBase.order.*;
-import com.BooksShopBackend.REST.API.models.orders.OrderBooksDTO;
-import com.BooksShopBackend.REST.API.models.orders.OrderDataDTO;
-import com.BooksShopBackend.REST.API.models.orders.OrderDeliveryAddressDTO;
-import com.BooksShopBackend.REST.API.models.orders.OrderPostDTO;
+import com.BooksShopBackend.REST.API.models.errors.OrderNotFoundError;
+import com.BooksShopBackend.REST.API.models.errors.UserNotFoundError;
+import com.BooksShopBackend.REST.API.models.orders.*;
 import com.BooksShopBackend.REST.API.repositories.BookListRepository;
 import com.BooksShopBackend.REST.API.repositories.UserRepository;
 //import com.BooksShopBackend.REST.API.repositories.orders.OrderBooksRepository;
 import com.BooksShopBackend.REST.API.repositories.orders.OrderBooksRepository;
+import com.BooksShopBackend.REST.API.repositories.orders.OrderDataRepository;
+import com.BooksShopBackend.REST.API.repositories.orders.OrderDeliveryAddressRepository;
 import com.BooksShopBackend.REST.API.repositories.orders.OrderRepository;
 import org.hibernate.validator.constraints.URL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,12 @@ public class OrderService {
 
     @Autowired
     private OrderBooksRepository orderBooksRepository;
+
+    @Autowired
+    private OrderDataRepository orderDataRepository;
+
+    @Autowired
+    private OrderDeliveryAddressRepository orderDeliveryAddressRepository;
 
 
     public String OrderPost(Integer userId, OrderPostDTO body) throws ParseException {
@@ -142,23 +149,60 @@ public class OrderService {
                 }
             }
 
-                newOrder.setOrderData(orderData);
-                orderData.setOrder(newOrder);
+            newOrder.setOrderData(orderData);
+            orderData.setOrder(newOrder);
 
-                newOrder.setOrderDeliveryAddress(orderDeliveryAddress);
-                orderDeliveryAddress.setOrder(newOrder);
+            newOrder.setOrderDeliveryAddress(orderDeliveryAddress);
+            orderDeliveryAddress.setOrder(newOrder);
 
-                newOrder.setOrderAdditional(orderAdditional);
-                orderAdditional.setOrder(newOrder);
+            newOrder.setOrderAdditional(orderAdditional);
+            orderAdditional.setOrder(newOrder);
 
-                newOrder.setOrderGifts(orderGifts);
-                orderGifts.setOrder(newOrder);
+            newOrder.setOrderGifts(orderGifts);
+            orderGifts.setOrder(newOrder);
 
 
-                orderRepository.save(newOrder);
+            orderRepository.save(newOrder);
 
-                return "Order accepted and registered under ID: " + orderId;
-            }
-            return "User with the provided userId does not exist";
+            return "Order accepted and registered under ID: " + orderId;
         }
+        return "User with the provided userId does not exist";
     }
+
+    @Transactional
+    public List<OrderGetResponseDTO> OrderGet(Integer userId) throws ParseException {
+        UserApplication user = getUserByUserId(userId);
+        if (user == null) {
+            throw new UserNotFoundError("User with the provided ID was not found.");
+        }
+
+        List<Order> userOrders = findByUserUserId(userId);
+        if (userOrders.isEmpty()) {
+            throw new OrderNotFoundError("No orders found for the user with the provided ID.");
+        }
+
+        List<OrderGetResponseDTO> responseDTOList = new ArrayList<>();
+
+        for (Order order : userOrders) {
+            OrderGetResponseDTO responseDTO = new OrderGetResponseDTO();
+
+            OrderData orderData = orderDataRepository.findByOrderId(order.getOrderId());
+            OrderDataDTO orderDataDTO = new OrderDataDTO();
+            orderDataDTO.setName(orderData.getName());
+            orderDataDTO.setSurname(orderData.getSurname());
+
+            responseDTO.setOrderData(orderDataDTO);
+            responseDTOList.add(responseDTO);
+        }
+
+        return responseDTOList;
+    }
+//    OrderDeliveryAddress orderDeliveryAddress = orderDeliveryAddressRepository.findByOrderId(order.getOrderId());
+    private List<Order> findByUserUserId(Integer userId) {
+        return orderRepository.findByUserUserId(userId);
+    }
+
+    private UserApplication getUserByUserId(Integer userId) {
+        return userRepository.findByUserId(userId).orElse(null);
+    }
+}

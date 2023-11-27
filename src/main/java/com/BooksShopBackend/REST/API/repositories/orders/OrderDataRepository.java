@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 @Repository
-
 public interface OrderDataRepository extends JpaRepository<OrderData, Integer> {
-    Optional<Order> findByOrderId(Integer orderId);
+    OrderData findByOrderId(Integer orderId);
 }
