@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface OrderAdditionalRepository extends JpaRepository<OrderAdditional, Integer> {
-    Optional<Order> findByOrderId(Integer orderId);
+    OrderAdditional findByOrderId(Integer orderId);
 }

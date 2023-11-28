@@ -16,11 +16,11 @@ public class OrderAdditional {
     @Column(name = "order_id")
     private Integer orderId;
 
-    @Temporal(TemporalType.TIMESTAMP) // Jeśli używasz typu java.util.Date
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "orderDate")
     private Date orderDate;
 
-    @Temporal(TemporalType.TIMESTAMP) // Jeśli używasz typu java.util.Date
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "deliveryDate")
     private Date deliveryDate;
 

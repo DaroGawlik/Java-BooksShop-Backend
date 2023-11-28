@@ -1,8 +1,12 @@
 package com.BooksShopBackend.REST.API.models.dataBase.order;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "OrderData")
 public class OrderData {
     @Id
@@ -19,33 +23,5 @@ public class OrderData {
     @MapsId
     @JoinColumn(name = "order_id")
     private Order order;
-
-    public void setOrder(Order order) {
-        this.order = order;
-    }
-    public Integer getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(Integer orderId) {
-        this.orderId = orderId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
 
 }

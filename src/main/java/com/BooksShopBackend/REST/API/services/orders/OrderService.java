@@ -6,19 +6,16 @@ import com.BooksShopBackend.REST.API.models.dataBase.UserApplication;
 import com.BooksShopBackend.REST.API.models.dataBase.order.*;
 import com.BooksShopBackend.REST.API.models.errors.OrderNotFoundError;
 import com.BooksShopBackend.REST.API.models.errors.UserNotFoundError;
-import com.BooksShopBackend.REST.API.models.orders.*;
+import com.BooksShopBackend.REST.API.models.ordersDTO.*;
 import com.BooksShopBackend.REST.API.repositories.BookListRepository;
 import com.BooksShopBackend.REST.API.repositories.UserRepository;
 //import com.BooksShopBackend.REST.API.repositories.orders.OrderBooksRepository;
-import com.BooksShopBackend.REST.API.repositories.orders.OrderBooksRepository;
-import com.BooksShopBackend.REST.API.repositories.orders.OrderDataRepository;
-import com.BooksShopBackend.REST.API.repositories.orders.OrderDeliveryAddressRepository;
-import com.BooksShopBackend.REST.API.repositories.orders.OrderRepository;
-import org.hibernate.validator.constraints.URL;
+import com.BooksShopBackend.REST.API.repositories.orders.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -31,6 +28,7 @@ public class OrderService {
 
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private OrderRepository orderRepository;
 
@@ -46,163 +44,270 @@ public class OrderService {
     @Autowired
     private OrderDeliveryAddressRepository orderDeliveryAddressRepository;
 
+    @Autowired
+    private OrderAdditionalRepository orderAdditionalRepository;
+
+    @Autowired
+    private OrderGiftsRepository orderGiftsRepository;
 
     public String OrderPost(Integer userId, OrderPostDTO body) throws ParseException {
-        Optional<UserApplication> userByUserId = userRepository.findByUserId(userId);
-        if (userByUserId.isPresent()) {
-            UserApplication user = userByUserId.get();
-
-            Order newOrder = new Order();
-            newOrder.setUser(user);
-            newOrder = orderRepository.save(newOrder);
-
-            Integer orderId = newOrder.getOrderId();
-
-            OrderDataDTO orderDataDTO = body.getOrderData();
-            OrderData orderData = new OrderData();
-            orderData.setOrderId(orderId);
-            orderData.setName(orderDataDTO.getName());
-            orderData.setSurname(orderDataDTO.getSurname());
-
-            OrderDeliveryAddressDTO orderDeliveryAddressDTO = body.getDeliveryAddress();
-            OrderDeliveryAddress orderDeliveryAddress = new OrderDeliveryAddress();
-            orderDeliveryAddress.setOrderId(orderId);
-            orderDeliveryAddress.setStreet(orderDeliveryAddressDTO.getStreet());
-            orderDeliveryAddress.setFlatNumber(orderDeliveryAddressDTO.getFlatNumber());
-            orderDeliveryAddress.setHouseNumber(orderDeliveryAddressDTO.getHouseNumber());
-
-
-            OrderAdditional orderAdditional = new OrderAdditional();
-
-            orderAdditional.setOrderId(orderId);
-            DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
-
-            Instant deliveryInstant = Instant.from(formatter.parse(body.getDeliveryDate()));
-            Instant orderInstant = Instant.from(formatter.parse(body.getOrderDate()));
-
-            SimpleDateFormat customDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-
-            String formattedDeliveryDate = customDateFormat.format(Date.from(deliveryInstant));
-            String formattedOrderDate = customDateFormat.format(Date.from(orderInstant));
-
-            Date deliveryDate = customDateFormat.parse(formattedDeliveryDate);
-            Date orderDate = customDateFormat.parse(formattedOrderDate);
-
-            orderAdditional.setDeliveryDate(deliveryDate);
-            orderAdditional.setOrderDate(orderDate);
-
-
-            orderAdditional.setAdditionalInformation(body.getAdditionalInformation());
-
-            orderAdditional.setPaymentType((body.getPaymentType()));
-
-
-            List<String> selectedGifts = body.getGifts();
-            OrderGifts orderGifts = new OrderGifts();
-
-            Map<String, String> giftColumnMapping = Map.of(
-                    "Pack as a gift", "TRUE",
-                    "Add postcard", "TRUE",
-                    "Provide 2% discount to the next time", "TRUE",
-                    "Branded pen or pencil", "TRUE"
-            );
-
-            for (String gift : selectedGifts) {
-                if (giftColumnMapping.containsKey(gift)) {
-                    switch (gift) {
-                        case "Pack as a gift":
-                            orderGifts.setGift1(giftColumnMapping.get(gift));
-                            break;
-                        case "Add postcard":
-                            orderGifts.setGift2(giftColumnMapping.get(gift));
-                            break;
-                        case "Provide 2% discount to the next time":
-                            orderGifts.setGift3(giftColumnMapping.get(gift));
-                            break;
-                        case "Branded pen or pencil":
-                            orderGifts.setGift4(giftColumnMapping.get(gift));
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-            List<OrderBooksDTO> selectedBooks = body.getBooks();
-            Optional<Order> orderOptional = orderRepository.findById(orderId);
-            Order order = orderOptional.get();
-            for (OrderBooksDTO bookInfo : selectedBooks) {
-                String author = bookInfo.getAuthor();
-                String title = bookInfo.getTitle();
-                Integer amount = bookInfo.getAmount();
-
-                Optional<BooksList> bookOptional = bookListRepository.findByAuthorAndTitle(author, title);
-
-                if (bookOptional.isPresent()) {
-                    BooksList foundBook = bookOptional.get();
-                    OrderBooks orderBooks = new OrderBooks();
-                    orderBooks.setOrder(order); // Przypisz obiekt Order do pola order
-                    orderBooks.setBook(foundBook);
-                    orderBooks.setAmount(amount);
-                    orderBooksRepository.save(orderBooks); // Zapisz orderBooks w bazie danych
-                } else {
-                    return "Book with author " + author + " and title " + title + " not found";
-                }
-            }
-
-            newOrder.setOrderData(orderData);
-            orderData.setOrder(newOrder);
-
-            newOrder.setOrderDeliveryAddress(orderDeliveryAddress);
-            orderDeliveryAddress.setOrder(newOrder);
-
-            newOrder.setOrderAdditional(orderAdditional);
-            orderAdditional.setOrder(newOrder);
-
-            newOrder.setOrderGifts(orderGifts);
-            orderGifts.setOrder(newOrder);
-
-
-            orderRepository.save(newOrder);
-
-            return "Order accepted and registered under ID: " + orderId;
-        }
-        return "User with the provided userId does not exist";
-    }
-
-    @Transactional
-    public List<OrderGetResponseDTO> OrderGet(Integer userId) throws ParseException {
         UserApplication user = getUserByUserId(userId);
         if (user == null) {
-            throw new UserNotFoundError("User with the provided ID was not found.");
+            return "User with the provided userId does not exist";
         }
 
-        List<Order> userOrders = findByUserUserId(userId);
-        if (userOrders.isEmpty()) {
-            throw new OrderNotFoundError("No orders found for the user with the provided ID.");
+        Order newOrder = createOrderForUser(user);
+
+        Integer orderId = newOrder.getOrderId();
+
+        OrderData orderData = createOrderData(orderId, body.getOrderData());
+        OrderDeliveryAddress orderDeliveryAddress = createOrderDeliveryAddress(orderId, body.getDeliveryAddress());
+        OrderAdditional orderAdditional = createOrderAdditional(orderId, body);
+        OrderGifts orderGifts = createOrderGifts(body.getGifts());
+
+        String createBooksResult = createOrderBooks(orderId, body.getBooks());
+        if (!createBooksResult.isEmpty()) {
+            return createBooksResult;
         }
 
-        List<OrderGetResponseDTO> responseDTOList = new ArrayList<>();
+        setOrderDetails(newOrder, orderData, orderDeliveryAddress, orderAdditional, orderGifts);
 
-        for (Order order : userOrders) {
-            OrderGetResponseDTO responseDTO = new OrderGetResponseDTO();
+        orderRepository.save(newOrder);
 
-            OrderData orderData = orderDataRepository.findByOrderId(order.getOrderId());
-            OrderDataDTO orderDataDTO = new OrderDataDTO();
-            orderDataDTO.setName(orderData.getName());
-            orderDataDTO.setSurname(orderData.getSurname());
-
-            responseDTO.setOrderData(orderDataDTO);
-            responseDTOList.add(responseDTO);
-        }
-
-        return responseDTOList;
-    }
-//    OrderDeliveryAddress orderDeliveryAddress = orderDeliveryAddressRepository.findByOrderId(order.getOrderId());
-    private List<Order> findByUserUserId(Integer userId) {
-        return orderRepository.findByUserUserId(userId);
+        return "Order accepted and registered under ID: " + orderId;
     }
 
     private UserApplication getUserByUserId(Integer userId) {
         return userRepository.findByUserId(userId).orElse(null);
     }
+
+    private Order createOrderForUser(UserApplication user) {
+        Order newOrder = new Order();
+        newOrder.setUser(user);
+        return orderRepository.save(newOrder);
+    }
+
+    private OrderData createOrderData(Integer orderId, OrderDataDTO orderDataDTO) {
+        OrderData orderData = new OrderData();
+        orderData.setOrderId(orderId);
+        orderData.setName(orderDataDTO.getName());
+        orderData.setSurname(orderDataDTO.getSurname());
+        return orderData;
+    }
+
+    private OrderDeliveryAddress createOrderDeliveryAddress(Integer orderId, OrderDeliveryAddressDTO deliveryAddressDTO) {
+        OrderDeliveryAddress orderDeliveryAddress = new OrderDeliveryAddress();
+        orderDeliveryAddress.setOrderId(orderId);
+        orderDeliveryAddress.setStreet(deliveryAddressDTO.getStreet());
+        orderDeliveryAddress.setFlatNumber(deliveryAddressDTO.getFlatNumber());
+        orderDeliveryAddress.setHouseNumber(deliveryAddressDTO.getHouseNumber());
+        return orderDeliveryAddress;
+    }
+
+    private OrderAdditional createOrderAdditional(Integer orderId, OrderPostDTO body) throws ParseException {
+        OrderAdditional orderAdditional = new OrderAdditional();
+        orderAdditional.setOrderId(orderId);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
+        Instant deliveryInstant = Instant.from(formatter.parse(body.getDeliveryDate()));
+        Instant orderInstant = Instant.from(formatter.parse(body.getOrderDate()));
+
+        SimpleDateFormat customDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        String formattedDeliveryDate = customDateFormat.format(Date.from(deliveryInstant));
+        String formattedOrderDate = customDateFormat.format(Date.from(orderInstant));
+
+        Date deliveryDate = customDateFormat.parse(formattedDeliveryDate);
+        Date orderDate = customDateFormat.parse(formattedOrderDate);
+
+        orderAdditional.setDeliveryDate(deliveryDate);
+        orderAdditional.setOrderDate(orderDate);
+
+        orderAdditional.setAdditionalInformation(body.getAdditionalInformation());
+        orderAdditional.setPaymentType(body.getPaymentType());
+
+        return orderAdditional;
+    }
+
+    private OrderGifts createOrderGifts(List<String> selectedGifts) {
+        OrderGifts orderGifts = new OrderGifts();
+
+        Map<String, String> giftColumnMapping = Map.of(
+                "Pack as a gift", "gift1",
+                "Add postcard", "gift2",
+                "Provide 2% discount to the next time", "gift3",
+                "Branded pen or pencil", "gift4"
+        );
+
+        for (String gift : selectedGifts) {
+            String columnName = giftColumnMapping.get(gift);
+            if (columnName != null) {
+                setGiftField(orderGifts, columnName);
+            }
+        }
+        return orderGifts;
+    }
+
+    private void setGiftField(OrderGifts orderGifts, String columnName) {
+        try {
+            Field field = OrderGifts.class.getDeclaredField(columnName);
+            field.setAccessible(true);
+            field.set(orderGifts, "TRUE");
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String createOrderBooks(Integer orderId, List<OrderBooksDTO> booksDTOList) {
+        for (OrderBooksDTO bookInfo : booksDTOList) {
+            String author = bookInfo.getAuthor();
+            String title = bookInfo.getTitle();
+            Integer amount = bookInfo.getAmount();
+
+            Optional<BooksList> bookOptional = bookListRepository.findByAuthorAndTitle(author, title);
+
+            if (bookOptional.isPresent()) {
+                saveOrderBook(orderId, bookOptional.get(), amount);
+            } else {
+                return "Book with author " + author + " and title " + title + " not found";
+            }
+        }
+        return "";
+    }
+
+    private void saveOrderBook(Integer orderId, BooksList foundBook, Integer amount) {
+        OrderBooks orderBooks = new OrderBooks();
+        orderBooks.setOrder(orderRepository.getOne(orderId));
+        orderBooks.setBook(foundBook);
+        orderBooks.setAmount(amount);
+        orderBooksRepository.save(orderBooks);
+    }
+    @Transactional
+    public List<OrderGetResponseDTO> OrderGet(Integer userId) throws ParseException {
+        UserApplication user = getUserByUserId(userId);
+        validateUserExists(user);
+
+        List<Order> userOrders = findOrdersByUserId(userId);
+        validateOrdersExist(userOrders);
+
+        return mapOrdersToResponseDTOs(userOrders);
+    }
+    private List<Order> findOrdersByUserId(Integer userId) {
+        return orderRepository.findByUserUserId(userId);
+    }
+
+    private void validateUserExists(UserApplication user) {
+        if (user == null) {
+            throw new UserNotFoundError("User with the provided ID was not found.");
+        }
+    }
+
+    private void validateOrdersExist(List<Order> userOrders) {
+        if (userOrders.isEmpty()) {
+            throw new OrderNotFoundError("No orders found for the user with the provided ID.");
+        }
+    }
+
+    private List<OrderGetResponseDTO> mapOrdersToResponseDTOs(List<Order> userOrders) {
+        List<OrderGetResponseDTO> responseDTOList = new ArrayList<>();
+
+        for (Order order : userOrders) {
+            OrderGetResponseDTO responseDTO = createOrderResponseDTO(order);
+            responseDTOList.add(responseDTO);
+        }
+        return responseDTOList;
+    }
+
+    private OrderGetResponseDTO createOrderResponseDTO(Order order) {
+        OrderGetResponseDTO responseDTO = new OrderGetResponseDTO();
+
+        OrderDataDTO orderDataDTO = createOrderDataDTO(order);
+        responseDTO.setOrderData(orderDataDTO);
+
+        OrderDeliveryAddressDTO deliveryAddressDTO = createOrderDeliveryAddressDTO(order);
+        responseDTO.setDeliveryAddress(deliveryAddressDTO);
+
+        List<String> orderGiftsDTOList = getGiftsForOrder(order);
+        responseDTO.setGifts(orderGiftsDTOList);
+
+        OrderAdditional orderAdditional = orderAdditionalRepository.findByOrderId(order.getOrderId());
+        responseDTO.setDeliveryDate(String.valueOf(orderAdditional.getDeliveryDate()));
+        responseDTO.setAdditionalInformation(orderAdditional.getAdditionalInformation());
+        responseDTO.setPaymentType(orderAdditional.getPaymentType());
+
+        List<OrderBooksDTO> orderBooksDTO = createOrderBooksDTO(order);
+        responseDTO.setBooks(orderBooksDTO);
+
+        return responseDTO;
+    }
+
+    private List<OrderBooksDTO> createOrderBooksDTO(Order order) {
+        List<OrderBooksDTO> orderBooksDTOList = new ArrayList<>();
+
+        List<OrderBooks> orderBooksList = orderBooksRepository.findByOrder(order);
+
+        for (OrderBooks orderBooks : orderBooksList) {
+            OrderBooksDTO orderBooksDTO = new OrderBooksDTO();
+            orderBooksDTO.setAuthor(orderBooks.getBook().getAuthor());
+            orderBooksDTO.setTitle(orderBooks.getBook().getTitle());
+            orderBooksDTO.setAmount(orderBooks.getAmount());
+            orderBooksDTOList.add(orderBooksDTO);
+        }
+        return orderBooksDTOList;
+    }
+
+    private OrderDataDTO createOrderDataDTO(Order order) {
+        OrderData orderData = orderDataRepository.findByOrderId(order.getOrderId());
+        OrderDataDTO orderDataDTO = new OrderDataDTO();
+        orderDataDTO.setName(orderData.getName());
+        orderDataDTO.setSurname(orderData.getSurname());
+        return orderDataDTO;
+    }
+
+    private OrderDeliveryAddressDTO createOrderDeliveryAddressDTO(Order order) {
+        OrderDeliveryAddress orderDeliveryAddress = orderDeliveryAddressRepository.findByOrderId(order.getOrderId());
+        OrderDeliveryAddressDTO deliveryAddressDTO = new OrderDeliveryAddressDTO();
+        deliveryAddressDTO.setStreet(orderDeliveryAddress.getStreet());
+        deliveryAddressDTO.setHouseNumber(orderDeliveryAddress.getHouseNumber());
+        deliveryAddressDTO.setFlatNumber(orderDeliveryAddress.getFlatNumber());
+        return deliveryAddressDTO;
+    }
+
+    public List<String> getGiftsForOrder(Order order) {
+        OrderGifts orderGifts = orderGiftsRepository.findByOrderId(order.getOrderId());
+        List<String> orderGiftsDTOList = new ArrayList<>();
+
+        Map<String, String> giftColumnMapping = Map.of(
+                "gift1", "Pack as a gift",
+                "gift2", "Add postcard",
+                "gift3", "Provide 2% discount to the next time",
+                "gift4", "Branded pen or pencil"
+        );
+
+        for (Map.Entry<String, String> entry : giftColumnMapping.entrySet()) {
+            String columnName = entry.getKey();
+            String giftName = entry.getValue();
+            try {
+                Field field = OrderGifts.class.getDeclaredField(columnName);
+                field.setAccessible(true);
+                String giftValue = (String) field.get(orderGifts);
+
+                if ("TRUE".equals(giftValue)) {
+                    orderGiftsDTOList.add(giftName);
+                }
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return orderGiftsDTOList;
+    }
+
+    private void setOrderDetails(Order newOrder, OrderData orderData, OrderDeliveryAddress orderDeliveryAddress,
+                                 OrderAdditional orderAdditional, OrderGifts orderGifts) {
+        newOrder.setOrderData(orderData);
+        newOrder.setOrderDeliveryAddress(orderDeliveryAddress);
+        newOrder.setOrderAdditional(orderAdditional);
+        newOrder.setOrderGifts(orderGifts);
+    }
 }
+
+

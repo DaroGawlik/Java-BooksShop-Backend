@@ -1,13 +1,10 @@
 package com.BooksShopBackend.REST.API.controllers.orders;
 
 
-import com.BooksShopBackend.REST.API.models.account.UserDataUpdateUserNameDTO;
-import com.BooksShopBackend.REST.API.models.auth.RegistrationResponseDTO;
 import com.BooksShopBackend.REST.API.models.errors.ApplicationError;
 import com.BooksShopBackend.REST.API.models.errors.EmailAlreadyExistsExceptionError;
-import com.BooksShopBackend.REST.API.models.orders.OrderGetDTO;
-import com.BooksShopBackend.REST.API.models.orders.OrderGetResponseDTO;
-import com.BooksShopBackend.REST.API.models.orders.OrderPostDTO;
+import com.BooksShopBackend.REST.API.models.ordersDTO.OrderGetResponseDTO;
+import com.BooksShopBackend.REST.API.models.ordersDTO.OrderPostDTO;
 import com.BooksShopBackend.REST.API.services.orders.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,14 +26,14 @@ public class OrderController {
     @PostMapping("/post")
     public ResponseEntity<?> OrderPost(@PathVariable Integer userId, @RequestBody OrderPostDTO body) throws ParseException {
         System.out.println("Received request body: " + body);
-
         String orderResponse  = orderService.OrderPost(userId, body);
         return ResponseEntity.ok(orderResponse);
     }
 
-    @PostMapping("/get")
-    public ResponseEntity<?> OrderGet(@PathVariable Integer userId, @RequestBody OrderGetDTO body) throws ParseException {
-        if (body.getReturnSecureToken() == null || !body.getReturnSecureToken()) {
+    @GetMapping("/get")
+    public ResponseEntity<?> OrderGet(@PathVariable Integer userId, @RequestParam(name = "returnSecureToken", defaultValue = "true") boolean returnSecureToken
+    ) throws ParseException {
+        if (!returnSecureToken) {
             ApplicationError e = new ApplicationError("Get orders with returnSecureToken = false is not allowed");
             return ResponseEntity.badRequest().body(e);
         }
@@ -46,6 +43,5 @@ public class OrderController {
         } catch (EmailAlreadyExistsExceptionError e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-
     }
 }

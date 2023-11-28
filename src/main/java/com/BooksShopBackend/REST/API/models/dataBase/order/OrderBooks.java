@@ -29,25 +29,7 @@ public class OrderBooks {
     @Column(name = "amount")
     private Integer amount;
 
-
-
     @Column(name = "order_id", insertable = false, updatable = false, columnDefinition = "int")
-    private Integer orderId; // Dodatkowa kolumna do zachowania relacji do zamówienia
-
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Long id;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "order_id")
-//    private Order order;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "book_id")
-//    private BooksList book;
-//
-//    @Column(name = "amount")
-//    private Integer amount;
-
+    private Integer orderId;
 
 }

@@ -1,10 +1,9 @@
-package com.BooksShopBackend.REST.API.models.orders;
+package com.BooksShopBackend.REST.API.models.ordersDTO;
 
 import lombok.Getter;
 
 import java.util.List;
 
-import lombok.Getter;
 import lombok.Setter;
 
 @Getter
