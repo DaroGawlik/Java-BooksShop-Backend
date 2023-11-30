@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 @Table(name = "OrderData")
 public class OrderData {
+
     @Id
     @Column(name = "order_id")
     private Integer orderId;
@@ -20,8 +21,6 @@ public class OrderData {
     private String surname;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
     @JoinColumn(name = "order_id")
     private Order order;
-
 }

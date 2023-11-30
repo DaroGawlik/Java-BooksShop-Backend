@@ -7,9 +7,9 @@ import lombok.Setter;
 import java.util.Date;
 
 @Entity
-@Table(name = "OrderAdditional")
 @Getter
 @Setter
+@Table(name = "OrderAdditional")
 public class OrderAdditional {
 
     @Id
@@ -31,7 +31,7 @@ public class OrderAdditional {
     private String paymentType;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
+//    @MapsId
     @JoinColumn(name = "order_id")
     private Order order;
 }

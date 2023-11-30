@@ -7,6 +7,7 @@ import java.util.List;
 @Getter
 @Setter
 public class OrderGetResponseDTO {
+    private int OrderId;
     private OrderDataDTO orderData;
     private List<OrderBooksDTO> books;
     private OrderDeliveryAddressDTO deliveryAddress;

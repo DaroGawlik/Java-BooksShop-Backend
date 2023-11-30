@@ -23,7 +23,7 @@ public class OrderDeliveryAddress {
     private String houseNumber;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
+//    @MapsId
     @JoinColumn(name = "order_id")
     private Order order;
 }

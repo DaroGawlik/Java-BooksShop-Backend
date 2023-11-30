@@ -14,11 +14,6 @@ public class OrderGifts {
     @Column(name = "order_id")
     private Integer orderId;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "order_id")
-    private Order order;
-
     @Column(name = "Pack as a gift")
     private String gift1;
 
@@ -30,4 +25,8 @@ public class OrderGifts {
 
     @Column(name = "Branded pen or pencil")
     private String gift4;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private Order order;
 }

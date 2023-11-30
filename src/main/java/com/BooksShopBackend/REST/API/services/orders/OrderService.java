@@ -9,7 +9,6 @@ import com.BooksShopBackend.REST.API.models.errors.UserNotFoundError;
 import com.BooksShopBackend.REST.API.models.ordersDTO.*;
 import com.BooksShopBackend.REST.API.repositories.BookListRepository;
 import com.BooksShopBackend.REST.API.repositories.UserRepository;
-//import com.BooksShopBackend.REST.API.repositories.orders.OrderBooksRepository;
 import com.BooksShopBackend.REST.API.repositories.orders.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +20,8 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 @Service
 @Transactional
@@ -63,7 +64,7 @@ public class OrderService {
         OrderData orderData = createOrderData(orderId, body.getOrderData());
         OrderDeliveryAddress orderDeliveryAddress = createOrderDeliveryAddress(orderId, body.getDeliveryAddress());
         OrderAdditional orderAdditional = createOrderAdditional(orderId, body);
-        OrderGifts orderGifts = createOrderGifts(body.getGifts());
+        OrderGifts orderGifts = createOrderGifts(orderId, body.getGifts());
 
         String createBooksResult = createOrderBooks(orderId, body.getBooks());
         if (!createBooksResult.isEmpty()) {
@@ -71,7 +72,6 @@ public class OrderService {
         }
 
         setOrderDetails(newOrder, orderData, orderDeliveryAddress, orderAdditional, orderGifts);
-
         orderRepository.save(newOrder);
 
         return "Order accepted and registered under ID: " + orderId;
@@ -128,34 +128,27 @@ public class OrderService {
         return orderAdditional;
     }
 
-    private OrderGifts createOrderGifts(List<String> selectedGifts) {
+    private static OrderGifts createOrderGifts(Integer orderId, List<String> selectedGifts) {
         OrderGifts orderGifts = new OrderGifts();
+        orderGifts.setOrderId(orderId);
 
-        Map<String, String> giftColumnMapping = Map.of(
-                "Pack as a gift", "gift1",
-                "Add postcard", "gift2",
-                "Provide 2% discount to the next time", "gift3",
-                "Branded pen or pencil", "gift4"
+        Map<String, BiConsumer<OrderGifts, String>> giftColumnActions = Map.of(
+                "Pack as a gift", OrderGifts::setGift1,
+                "Add postcard", OrderGifts::setGift2,
+                "Provide 2% discount to the next time", OrderGifts::setGift3,
+                "Branded pen or pencil", OrderGifts::setGift4
         );
 
-        for (String gift : selectedGifts) {
-            String columnName = giftColumnMapping.get(gift);
-            if (columnName != null) {
-                setGiftField(orderGifts, columnName);
+        selectedGifts.forEach(gift -> {
+            BiConsumer<OrderGifts, String> action = giftColumnActions.get(gift);
+            if (action != null) {
+                action.accept(orderGifts, "TRUE");
             }
-        }
+        });
+
         return orderGifts;
     }
 
-    private void setGiftField(OrderGifts orderGifts, String columnName) {
-        try {
-            Field field = OrderGifts.class.getDeclaredField(columnName);
-            field.setAccessible(true);
-            field.set(orderGifts, "TRUE");
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-    }
 
     private String createOrderBooks(Integer orderId, List<OrderBooksDTO> booksDTOList) {
         for (OrderBooksDTO bookInfo : booksDTOList) {
@@ -181,6 +174,15 @@ public class OrderService {
         orderBooks.setAmount(amount);
         orderBooksRepository.save(orderBooks);
     }
+
+    private void setOrderDetails(Order newOrder, OrderData orderData, OrderDeliveryAddress orderDeliveryAddress,
+                                 OrderAdditional orderAdditional, OrderGifts orderGifts) {
+        newOrder.setOrderData(orderData);
+        newOrder.setOrderDeliveryAddress(orderDeliveryAddress);
+        newOrder.setOrderAdditional(orderAdditional);
+        newOrder.setOrderGifts(orderGifts);
+    }
+
     @Transactional
     public List<OrderGetResponseDTO> OrderGet(Integer userId) throws ParseException {
         UserApplication user = getUserByUserId(userId);
@@ -219,6 +221,8 @@ public class OrderService {
 
     private OrderGetResponseDTO createOrderResponseDTO(Order order) {
         OrderGetResponseDTO responseDTO = new OrderGetResponseDTO();
+
+        responseDTO.setOrderId(order.getOrderId());
 
         OrderDataDTO orderDataDTO = createOrderDataDTO(order);
         responseDTO.setOrderData(orderDataDTO);
@@ -301,12 +305,19 @@ public class OrderService {
         return orderGiftsDTOList;
     }
 
-    private void setOrderDetails(Order newOrder, OrderData orderData, OrderDeliveryAddress orderDeliveryAddress,
-                                 OrderAdditional orderAdditional, OrderGifts orderGifts) {
-        newOrder.setOrderData(orderData);
-        newOrder.setOrderDeliveryAddress(orderDeliveryAddress);
-        newOrder.setOrderAdditional(orderAdditional);
-        newOrder.setOrderGifts(orderGifts);
+    @Transactional
+    public void deleteOrder(int orderId){
+        Order order = getOrderByOrderId(orderId);
+        if (order == null) {
+            throw new UserNotFoundError("Order with the provided ID was not found.");
+        }
+        List<OrderBooks> orderBooks = orderBooksRepository.findByOrder(order);
+        orderBooksRepository.deleteAll(orderBooks);
+        orderRepository.deleteById(orderId);
+    }
+
+    private Order getOrderByOrderId(Integer userId) {
+        return orderRepository.findOrderByOrderId(userId).orElse(null);
     }
 }
 
