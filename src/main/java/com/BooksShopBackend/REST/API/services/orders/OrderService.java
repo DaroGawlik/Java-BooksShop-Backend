@@ -21,7 +21,6 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 @Service
 @Transactional
@@ -235,6 +234,7 @@ public class OrderService {
 
         OrderAdditional orderAdditional = orderAdditionalRepository.findByOrderId(order.getOrderId());
         responseDTO.setDeliveryDate(String.valueOf(orderAdditional.getDeliveryDate()));
+        responseDTO.setOrderDate(String.valueOf(orderAdditional.getOrderDate()));
         responseDTO.setAdditionalInformation(orderAdditional.getAdditionalInformation());
         responseDTO.setPaymentType(orderAdditional.getPaymentType());
 
@@ -306,7 +306,7 @@ public class OrderService {
     }
 
     @Transactional
-    public void deleteOrder(int orderId){
+    public String DeleteOrder(int orderId) throws ParseException {
         Order order = getOrderByOrderId(orderId);
         if (order == null) {
             throw new UserNotFoundError("Order with the provided ID was not found.");
@@ -314,6 +314,8 @@ public class OrderService {
         List<OrderBooks> orderBooks = orderBooksRepository.findByOrder(order);
         orderBooksRepository.deleteAll(orderBooks);
         orderRepository.deleteById(orderId);
+
+        return "The order and their details have been successfully deleted.";
     }
 
     private Order getOrderByOrderId(Integer userId) {

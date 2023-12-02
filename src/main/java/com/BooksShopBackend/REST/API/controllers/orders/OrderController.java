@@ -52,8 +52,8 @@ public class OrderController {
             return ResponseEntity.badRequest().body(e);
         }
         try {
-            orderService.deleteOrder(orderId);
-            return ResponseEntity.ok("The user and their details have been successfully deleted.");
+            String response = orderService.DeleteOrder(orderId);
+            return ResponseEntity.ok(response);
         } catch (UserNotFoundError e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }

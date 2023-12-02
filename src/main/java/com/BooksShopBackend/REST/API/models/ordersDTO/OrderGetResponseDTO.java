@@ -7,11 +7,12 @@ import java.util.List;
 @Getter
 @Setter
 public class OrderGetResponseDTO {
-    private int OrderId;
+    private int orderId;
     private OrderDataDTO orderData;
     private List<OrderBooksDTO> books;
     private OrderDeliveryAddressDTO deliveryAddress;
     private String deliveryDate;
+    private String orderDate;
     private String additionalInformation;
     private List<String> gifts;
     private String paymentType;
