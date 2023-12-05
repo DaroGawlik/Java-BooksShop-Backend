@@ -23,8 +23,8 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody RegistrationDTO body) {
         if (body.getReturnSecureToken() == null || !body.getReturnSecureToken()) {
-            ApplicationError e = new ApplicationError("Registration with returnSecureToken = false is not allowed");
-            return ResponseEntity.badRequest().body(e);
+            TokenValueError e = new TokenValueError("Something is wrong with your token: registration isn't possible");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
         try {
             RegistrationResponseDTO responseDTO = authenticationService.registerUser(body.getUserName(), body.getEmail(), body.getPassword());
@@ -32,13 +32,13 @@ public class AuthenticationController {
         } catch (EmailAlreadyExistsExceptionError e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginDTO body) {
         if (body.getReturnSecureToken() == null || !body.getReturnSecureToken()) {
-            return ResponseEntity.badRequest().body(new ApplicationError("Login with returnSecureToken = false is not allowed"));
+            TokenValueError e = new TokenValueError("Something is wrong with your token: registration isn't possible");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
         try {
             LoginResponseDTO responseDTO = authenticationService.loginUser(body.getEmail(), body.getPassword());

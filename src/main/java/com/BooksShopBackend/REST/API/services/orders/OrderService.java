@@ -53,7 +53,7 @@ public class OrderService {
     public String OrderPost(Integer userId, OrderPostDTO body) throws ParseException {
         UserApplication user = getUserByUserId(userId);
         if (user == null) {
-            return "User with the provided userId does not exist";
+            throw new UserNotFoundError("Order with the provided ID was not found.");
         }
 
         Order newOrder = createOrderForUser(user);
@@ -204,7 +204,7 @@ public class OrderService {
 
     private void validateOrdersExist(List<Order> userOrders) {
         if (userOrders.isEmpty()) {
-            throw new OrderNotFoundError("No orders found for the user with the provided ID.");
+            throw new OrderNotFoundError("You don't have any orders yet.");
         }
     }
 
@@ -317,7 +317,7 @@ public class OrderService {
 
         return "The order and their details have been successfully deleted.";
     }
-assad
+
     private Order getOrderByOrderId(Integer userId) {
         return orderRepository.findOrderByOrderId(userId).orElse(null);
     }

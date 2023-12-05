@@ -1,9 +1,7 @@
 package com.BooksShopBackend.REST.API.controllers.orders;
 
 
-import com.BooksShopBackend.REST.API.models.errors.ApplicationError;
-import com.BooksShopBackend.REST.API.models.errors.EmailAlreadyExistsExceptionError;
-import com.BooksShopBackend.REST.API.models.errors.UserNotFoundError;
+import com.BooksShopBackend.REST.API.models.errors.*;
 import com.BooksShopBackend.REST.API.models.ordersDTO.OrderGetResponseDTO;
 import com.BooksShopBackend.REST.API.models.ordersDTO.OrderPostDTO;
 import com.BooksShopBackend.REST.API.services.orders.OrderService;
@@ -25,31 +23,35 @@ public class OrderController {
 
     @PostMapping("/post")
     public ResponseEntity<?> OrderPost(@PathVariable int userId, @RequestBody OrderPostDTO body) throws ParseException {
-        System.out.println("Received request body: " + body);
-        String orderResponse  = orderService.OrderPost(userId, body);
-        return ResponseEntity.ok(orderResponse);
+        try {
+            String orderResponse  = orderService.OrderPost(userId, body);
+            return ResponseEntity.ok(orderResponse);
+        } catch (UserNotFoundError e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
     @GetMapping("/get")
     public ResponseEntity<?> OrderGet(@PathVariable int userId, @RequestParam(name = "returnSecureToken", defaultValue = "true") boolean returnSecureToken
     ) throws ParseException {
         if (!returnSecureToken) {
-            ApplicationError e = new ApplicationError("Get orders with returnSecureToken = false is not allowed");
-            return ResponseEntity.badRequest().body(e);
+            TokenValueError e = new TokenValueError("Something is wrong with your token: registration isn't possible");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
         try {
             List<OrderGetResponseDTO> responseDTOList = orderService.OrderGet(userId);
             return ResponseEntity.ok(responseDTOList);
-        } catch (EmailAlreadyExistsExceptionError e) {
+        } catch (UserNotFoundError | OrderNotFoundError e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+
 
     @DeleteMapping("/delete/{orderId}")
     public ResponseEntity<?> deleteOrder(@PathVariable("orderId") int orderId, @RequestParam(name = "returnSecureToken", defaultValue = "true") boolean returnSecureToken
     ) throws ParseException {
         if (!returnSecureToken) {
-            ApplicationError e = new ApplicationError("Get orders with returnSecureToken = false is not allowed");
-            return ResponseEntity.badRequest().body(e);
+            TokenValueError e = new TokenValueError("Something is wrong with your token: registration isn't possible");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
         try {
             String response = orderService.DeleteOrder(orderId);
