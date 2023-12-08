@@ -19,7 +19,4 @@ public class OrderGetResponseDTO {
     public OrderGetResponseDTO() {
         super();
     }
-//    public OrderGetResponseDTO() {
-//        super();
-//    }
 }
