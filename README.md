@@ -1,6 +1,8 @@
 # Books Shop Project: Back-End Development
 
-Welcome to the Java Spring Boot back-end repository of My Project. This repository contains the server-side code and RESTful APIs built using the Spring Boot framework, with a MySQL database back-end.
+Welcome to the Java Spring Boot back-end repository of My Project. 
+This repository contains the server-side code and RESTful APIs built using the Spring Boot framework, with a MySQL database back-end.
+For the front-end implementation, please visit the [Angular-BooksShop repository](https://github.com/DaroGawlik/Angular-BooksShop). 
 
 ## Project Overview
 
