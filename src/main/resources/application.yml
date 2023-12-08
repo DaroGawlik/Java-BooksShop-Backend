@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url:
+    username:
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    generate-ddl: true
+    show-sql: true
+    hibernate:
+#      ddl-auto: none
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+      jdbc:
+        time_zone: UTC
